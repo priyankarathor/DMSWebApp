@@ -120,51 +120,171 @@
             }
         </style>
 
-    <div class="container">
-        <div class="row">
-            <form id="form-validation-2" class="form " action="{{route('discountdata')}}" method="post" enctype="multipart/form-data">
-                @csrf
-                <div class="col-lg-12 ">
-                    <div id="amount-rows">
-                        <div class="row amount-row">
-                            <div class="col-md-12">
-                         <div class="card mt-3">
-                        <div class="card-header">
-                            <h4 class="card-title" style="color:green; font-size:20px;">Add User Discount</h4>
-                        </div><!--end card-header-->
-                       
-                        <div class="card-body">
-                            <div class="row">
-                                
-                                <div class="mb-2 col-md-6" >
-                                    <label for="username" class="mb-2">Role</label>
-                                    <select  class="form-control" id="role" name="role" >
-                                        <option class="text-center">---------Select Role--------</option>
-                                        @foreach ($tab as $item)
-                                            <option value="{{$item->id}}">{{$item->role}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
 
-                                <div class="mb-2 col-md-6" >
-                                    <label for="username" class="mb-2">Commission Rate</label>
-                                    <input class="form-control" type="text" id="rate" name="rate" >
-                                </div>
+<div>
+    <div class="container mt-3">
 
-                                <div class="col-md-2 mb-4 mt-4">
-                                    <input type="submit" style="font-size:18px;  border-radius:10px;" class="btn btn-outline-success" value="Submit" />
-                                </div>
+        @if (session()->has('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        <div class="card">
+            <div class="card-header">
+                <h4 style="color:green; font-size:20px;">Add Discount</h4>
+            </div>
+
+            <div class="card-body">
+                <form wire:submit.prevent="discount">
+                    <div class="row">
+
+                        <div class="mb-3 col-md-6">
+                            <label class="mb-2">Discount Apply On</label>
+                            <select class="form-control" wire:model.live="discount_type">
+                                <option value="role">Whole Role</option>
+                                <option value="user">Only One User</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3 col-md-6">
+                            <label class="mb-2">Role</label>
+                            <select class="form-control" wire:model.live="role_id">
+                                <option value="">--------- Select Role ---------</option>
+                                @foreach ($tab as $item)
+                                    <option value="{{ $item->id }}">{{ $item->role }}</option>
+                                @endforeach
+                            </select>
+                            @error('role_id') <small class="text-danger">{{ $message }}</small> @enderror
+                        </div>
+
+                        @if ($discount_type === 'user')
+                            <div class="mb-3 col-md-6">
+                                <label class="mb-2">State</label>
+                                <select class="form-control" wire:model.live="state">
+                                    <option value="">--------- Select State ---------</option>
+                                    @foreach ($states as $item)
+                                        <option value="{{ $item->state }}">{{ $item->state }}</option>
+                                    @endforeach
+                                </select>
+                                @error('state') <small class="text-danger">{{ $message }}</small> @enderror
                             </div>
 
-                        </div><!--end card-body-->
+                            <div class="mb-3 col-md-6">
+                                <label class="mb-2">User</label>
+                                <select class="form-control" wire:model="user_id">
+                                    <option value="">--------- Select User ---------</option>
+
+                                    @foreach ($users as $user)
+                                        <option value="{{ $user->id }}">
+                                            {{ $user->username }}
+                                            -
+                                            {{ $user->registerid }}
+                                            -
+                                            {{ $user->email }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('user_id') <small class="text-danger">{{ $message }}</small> @enderror
                             </div>
-                            </div>
+                        @endif
+
+                        <div class="mb-3 col-md-6">
+                            <label class="mb-2">Discount Rate (%)</label>
+                            <input class="form-control" type="number" step="0.01" wire:model="rate">
+                            @error('rate') <small class="text-danger">{{ $message }}</small> @enderror
+                        </div>
+
+                        <div class="col-md-2 mt-4">
+                            <button type="submit" class="btn btn-outline-success">
+                                Submit
+                            </button>
+                        </div>
+
                     </div>
-                </div> 
-                </div>
-            </form><!--end form-->
-          </div>
+                </form>
+            </div>
+        </div>
     </div>
+
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">Discount List</span>
+            </div>
+
+            <div class="card-body">
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Discount Type</th>
+                                <th>Role</th>
+                                <th>State</th>
+                                <th>Username</th>
+                                <th>Register ID</th>
+                                <th>Email</th>
+                                <th>Discount</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @forelse ($disocunt as $index => $item)
+                                <tr>
+                                    <td>{{ $index + 1 }}</td>
+
+                                    <td>
+                                        @if ($item->discount_type === 'role')
+                                            Whole Role
+                                        @else
+                                            Single User
+                                        @endif
+                                    </td>
+
+                                    <td>
+                                        @php
+                                            $roleName = $tab->where('id', $item->role)->first();
+                                        @endphp
+
+                                        {{ $roleName->role ?? 'N/A' }}
+                                    </td>
+
+                                    <td>{{ $item->state ?? '-' }}</td>
+                                    <td>{{ $item->username ?? '-' }}</td>
+                                    <td>{{ $item->registerid ?? '-' }}</td>
+                                    <td>{{ $item->email ?? '-' }}</td>
+                                    <td>{{ $item->rate }}%</td>
+
+                                    <td>
+                                        <button 
+                                            wire:click="deletediscountdata({{ $item->id }})"
+                                            onclick="return confirm('Are you sure?')"
+                                            class="btn btn-outline-danger btn-sm">
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="9" class="text-center">
+                                        No discount data found.
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+
+                    </table>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 
     <div class="container mt-3">
         <div class="row">

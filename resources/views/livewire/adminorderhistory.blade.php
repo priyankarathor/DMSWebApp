@@ -1,291 +1,272 @@
 <div>
-    <script src="{{asset('assets/js/custom.js')}}"></script>
-  <style>
-          .switch {
-            position: relative;
-            display: inline-block;
-            width: 50px;
-            margin-left: 0px;
-            height: 27px;
-          }
-          
-          .switch input { 
-            opacity: 0;
-            width: 0;
-            height: 0;
-          }
-          
-          .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            -webkit-transition: .4s;
-            transition: .4s;
-          }
-          
-          .slider:before {
-            position: absolute;
-            content: "";
-            height: 18px;
-            width: 18px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            -webkit-transition: .4s;
-            transition: .4s;
-          }
-          
-          input:checked + .slider {
-            background-color: #115e0f;
-          }
-          
-          input:focus + .slider {
-            box-shadow: 0 0 1px #115e0f;
-          }
-          
-          input:checked + .slider:before {
-            -webkit-transform: translateX(26px);
-            -ms-transform: translateX(26px);
-            transform: translateX(26px);
-          }
-          
-          /* Rounded sliders */
-          .slider.round {
-            border-radius: 34px;
-          }
-          
-          .slider.round:before {
-            border-radius: 50%;
-          }
-      
-            .modal-body {
-              width: 100%;
-              max-width: 100%;
-              overflow: hidden;
-            }
-          
-            .modal-body p {
-              word-wrap: break-word;
-              word-break: break-all;
-              overflow: hidden;
-            }
-          
-          .modal-body {
-          max-height: 70vh; 
-          overflow-y: auto; 
-          }
-      
-          .section p {
-              word-wrap: break-word; 
-              white-space: normal; 
-          }
-          .dropbtn {
-                background-color: #fff;
-                color: #000;
-                padding: 16px;
-                font-size: 16px;
-                border: none;
-                cursor: pointer;
-              }
-              .dropdown-content {
-                display: none;
-                position: absolute;
-                background-color: #f9f9f9;
-                min-width: 100px;
-                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-                z-index: 1;
-                right: 0; /* Align the dropdown content to the right */
-              }
-              
-              .dropdown-content a {
-                color: black;
-                padding: 12px 16px;
-                text-decoration: none;
-                display: block;
-              }
-              
-              .dropdown-content a:hover {
-                background-color: #f1f1f1;
-              }
-              
-              .dropdown:hover .dropdown-content {
-                display: block;
-              }
-              
-              .dropdown:hover .dropbtn {
-                background-color: #23650a;
-              }
-          </style>
-      <div class="container mt-4">
-          <div class="row">
-              <div class="col-md-12">
-      <div class="card">
-         
-          <div class="card-header">
-              <div class="row ">
-                  <div class="col-md-8 col-12" >
-                  <span class="card-title mt-1">Approved order Details</span> &nbsp;&nbsp;
-                  
-                  <button onclick="exportTableToExcel('myTable', 'InvoicesData')" class="btn btn-outline-success mt-1" style="font-size:15px; border-radius:40px;">Excel</button>
-                    <button onclick="downloadPDF()" class="btn btn-outline-success mt-1" style="font-size:15px; border-radius:40px;">PDF</button>
-                 
-                  </div>
-  
-                  <div class="col-md-4 mt-1">
-                    <div class="row justify-content-end">
-                          <div class=" d-flex align-items-center">
-                              <span for="search" class="form-label me-2">Search:</span>
-                              <input type="text" class="form-control" name="search" id="search" placeholder="Search table data...">
-                          
-                      </div>
-                  </div>
-                  </div>
-              </div>
-          </div><!--end card-header-->
-          
-          <div class="card-body">
-          <div class="table-responsive">
-            <table class="table mb-0"  id="myTable" >
-          <thead class="thead-light">
-          <tr>
-          <th>Product Name</th>
-          <th>Product Quantity</th>
-          <th>Bulk(Box/BKT)</th>
-          <th>Product Amount</th>
-          <th>Total Amount</td>
-          <th>Approved Date</td>
-          <th>Access</th>
-          </tr>
-          </thead>
-          <tbody>
-            @foreach ($approve as $products)
-                @if (is_null($products->approveuserid)) <!-- Check if approveuserid is null -->
-                    @php
-                        $productNames = explode(',', $products->productname);
-                        $productquantity = explode(',', $products->productquantity);
-                        $productbulk = explode(',', $products->productbulk);
-                        $amount = explode(',', $products->amount);
-                        $totalamount = explode(',', $products->totalamount);
-                    @endphp
-        
-                    @foreach($productNames as $index => $productName)
-                        <tr>
-                            <td>{{ $productName }}</td>
-                            <td>{{ $productquantity[$index] ?? '' }}</td>
-                            <td>{{ $productbulk[$index] ?? '' }}</td>
-                            <td>{{ $totalamount[$index] ?? '' }}</td>
-                            <td>{{ $amount[$index] ?? '' }}</td>
-                            <td>{{ $products->created_at}}</td>
-                            
-                            <td>
-                                <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal{{ $products->id . $index }}">
-                                    <i class="bi bi-eye-fill"></i>
+    <style>
+        .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .table th,
+        .table td {
+            white-space: nowrap;
+            vertical-align: middle;
+        }
+    </style>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-12">
+
+                <div class="card">
+
+                    <div class="card-header">
+                        <div class="row align-items-center">
+
+                            <div class="col-md-5 col-12">
+                                <span class="card-title mt-1">Approved Order Details</span>
+
+                                <button onclick="exportTableToExcel('myTable', 'InvoicesData')"
+                                        class="btn btn-outline-success mt-1"
+                                        style="font-size:15px; border-radius:40px;">
+                                    Excel
                                 </button>
-                            </td>
-        
-                            <!-- Modal for Product Details -->
-                            <div class="modal fade" id="exampleModal{{ $products->id . $index }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                                <div class="modal-dialog">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title" id="exampleModalLabel">Product Details</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <div class="table-responsive">
-                                                <!-- Vertical Table Layout -->
-                                                <div class="border p-2 mb-2">
-                                                    <strong>Product HSN No:</strong> <span>{{ $products->hsnno }}</span>
-                                                </div>
-                                                
-                                                  <div class="border p-2 mb-2">
-                                                    <strong>User Name:</strong> <span>{{ $products->username }}</span>
-                                                </div> 
-                                                
-                                                <div class="border p-2 mb-2">
-                                                    <strong>User Role:</strong> <span>{{ $products->userrole }}</span>
-                                                </div>
-                                                
-                                                   <div class="border p-2 mb-2">
-                                                    <strong>User address:</strong> <span>{{ $products->address }}</span>
-                                                </div>
-                                                
-                                                <div class="border p-2 mb-2">
-                                                    <strong>Driver Company:</strong> <span>{{ $products->drivercompany }}</span>
-                                                </div>
-                                                <div class="border p-2 mb-2">
-                                                    <strong>Driver Name:</strong> <span>{{ $products->drivername }}</span>
-                                                </div>
-                                                <div class="border p-2 mb-2">
-                                                    <strong>Vehicle No:</strong> <span>{{ $products->vehicleno }}</span>
-                                                </div>
-                                                <div class="border p-2 mb-2">
-                                                    <strong>Driver Contact:</strong> <span>{{ $products->drivercontact }}</span>
+
+                                <button onclick="downloadCSV()"
+                                        class="btn btn-outline-success mt-1"
+                                        style="font-size:15px; border-radius:40px;">
+                                    CSV
+                                </button>
+                            </div>
+
+                            <div class="col-md-3 mt-1">
+                                <select wire:model.live="perPage" class="form-control">
+                                    <option value="10">10 Records</option>
+                                    <option value="20">20 Records</option>
+                                    <option value="50">50 Records</option>
+                                    <option value="100">100 Records</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-4 mt-1">
+                                <input type="text"
+                                       wire:model.live.debounce.500ms="search"
+                                       class="form-control"
+                                       placeholder="Search invoice/user/product...">
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="mb-2">
+                            <strong>Total Records:</strong> {{ $approve->total() }}
+                        </div>
+
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped mb-0" id="myTable">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Invoice No</th>
+                                        <th>Invoice Date</th>
+                                        <th>Firm Name</th>
+                                        <th>GST No</th>
+                                        <th>User Name</th>
+                                        <th>Contact</th>
+                                        <th>Email</th>
+                                        <th>Region</th>
+                                        <th>Address</th>
+                                        <th>Product Name</th>
+                                        <th>Product Quantity</th>
+                                        <th>Bulk(Box/BKT)</th>
+                                        <th>Amount</th>
+                                        <th>Total Amount</th>
+                                        <th>GST Rate</th>
+                                        <th>GST Type</th>
+                                        <th>SGST</th>
+                                        <th>CGST</th>
+                                        <th>Approved Date</th>
+                                        <th>Access</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    @forelse ($approve as $products)
+
+                                        @php
+                                            $productNames = explode(',', $products->productname ?? '');
+                                            $productquantity = explode(',', $products->productquantity ?? '');
+                                            $productbulk = explode(',', $products->productbulk ?? '');
+                                            $amount = explode(',', $products->amount ?? '');
+                                            $totalamount = explode(',', $products->totalamount ?? '');
+                                        @endphp
+
+                                        @foreach ($productNames as $index => $productName)
+                                            <tr>
+                                                <td>{{ $loop->parent->iteration + (($approve->currentPage() - 1) * $approve->perPage()) }}</td>
+
+                                                <td>{{ $products->invoiceno ?? 'N/A' }}</td>
+                                                <td>{{ $products->invoicedate ?? 'N/A' }}</td>
+                                                <td>{{ $products->framname ?? 'N/A' }}</td>
+                                                <td>{{ $products->gstnumber ?? 'N/A' }}</td>
+                                                <td>{{ $products->username ?? 'N/A' }}</td>
+                                                <td>{{ $products->contactno ?? 'N/A' }}</td>
+                                                <td>{{ $products->email ?? 'N/A' }}</td>
+                                                <td>{{ $products->region ?? 'N/A' }}</td>
+                                                <td>{{ $products->address ?? 'N/A' }}</td>
+
+                                                <td>{{ trim($productName) ?: 'N/A' }}</td>
+                                                <td>{{ $productquantity[$index] ?? 'N/A' }}</td>
+                                                <td>{{ $productbulk[$index] ?? 'N/A' }}</td>
+                                                <td>{{ $amount[$index] ?? 'N/A' }}</td>
+                                                <td>{{ $totalamount[$index] ?? 'N/A' }}</td>
+
+                                                <td>{{ $products->gstrate ?? 'N/A' }}</td>
+                                                <td>{{ $products->selectgst ?? 'N/A' }}</td>
+                                                <td>{{ $products->sgst ?? 'N/A' }}</td>
+                                                <td>{{ $products->cgst ?? 'N/A' }}</td>
+                                                <td>{{ $products->created_at ?? 'N/A' }}</td>
+
+                                                <td>
+                                                    <button type="button"
+                                                            class="btn btn-outline-success btn-sm"
+                                                            data-bs-toggle="modal"
+                                                            data-bs-target="#exampleModal{{ $products->id }}{{ $index }}">
+                                                        <i class="bi bi-eye-fill"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+
+                                            <div class="modal fade"
+                                                 id="exampleModal{{ $products->id }}{{ $index }}"
+                                                 tabindex="-1"
+                                                 aria-hidden="true"
+                                                 wire:ignore.self>
+                                                <div class="modal-dialog modal-lg">
+                                                    <div class="modal-content">
+
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title">Order Full Details</h5>
+                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                                        </div>
+
+                                                        <div class="modal-body">
+                                                            <div class="row">
+
+                                                                <div class="col-md-6 mb-2"><b>Invoice No:</b> {{ $products->invoiceno ?? 'N/A' }}</div>
+                                                                <div class="col-md-6 mb-2"><b>Invoice Date:</b> {{ $products->invoicedate ?? 'N/A' }}</div>
+
+                                                                <div class="col-md-6 mb-2"><b>Firm Name:</b> {{ $products->framname ?? 'N/A' }}</div>
+                                                                <div class="col-md-6 mb-2"><b>GST Number:</b> {{ $products->gstnumber ?? 'N/A' }}</div>
+
+                                                                <div class="col-md-6 mb-2"><b>User Name:</b> {{ $products->username ?? 'N/A' }}</div>
+                                                                <div class="col-md-6 mb-2"><b>Contact No:</b> {{ $products->contactno ?? 'N/A' }}</div>
+
+                                                                <div class="col-md-6 mb-2"><b>Email:</b> {{ $products->email ?? 'N/A' }}</div>
+                                                                <div class="col-md-6 mb-2"><b>Region:</b> {{ $products->region ?? 'N/A' }}</div>
+
+                                                                <div class="col-md-12 mb-2"><b>Address:</b> {{ $products->address ?? 'N/A' }}</div>
+
+                                                                <hr>
+
+                                                                <div class="col-md-6 mb-2"><b>Product Name:</b> {{ trim($productName) ?: 'N/A' }}</div>
+                                                                <div class="col-md-6 mb-2"><b>Product Quantity:</b> {{ $productquantity[$index] ?? 'N/A' }}</div>
+
+                                                                <div class="col-md-6 mb-2"><b>Bulk:</b> {{ $productbulk[$index] ?? 'N/A' }}</div>
+                                                                <div class="col-md-6 mb-2"><b>Amount:</b> {{ $amount[$index] ?? 'N/A' }}</div>
+
+                                                                <div class="col-md-6 mb-2"><b>Total Amount:</b> {{ $totalamount[$index] ?? 'N/A' }}</div>
+                                                                <div class="col-md-6 mb-2"><b>GST Rate:</b> {{ $products->gstrate ?? 'N/A' }}</div>
+
+                                                                <div class="col-md-6 mb-2"><b>GST Type:</b> {{ $products->selectgst ?? 'N/A' }}</div>
+                                                                <div class="col-md-6 mb-2"><b>SGST:</b> {{ $products->sgst ?? 'N/A' }}</div>
+
+                                                                <div class="col-md-6 mb-2"><b>CGST:</b> {{ $products->cgst ?? 'N/A' }}</div>
+
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                                Close
+                                                            </button>
+                                                        </div>
+
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            {{-- <button type="button" class="btn btn-success">Save changes</button> --}}
-                                        </div>
-                                    </div>
-                                </div>
+                                        @endforeach
+
+                                    @empty
+                                        <tr>
+                                            <td colspan="21" class="text-center">No approved order found.</td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div>
+                                Showing {{ $approve->firstItem() ?? 0 }} to {{ $approve->lastItem() ?? 0 }}
+                                of {{ $approve->total() }} records
                             </div>
-                        </tr>
-                    @endforeach
-                @endif
-            @endforeach
-        </tbody>
-        
-            <!-- Modal -->
-           
-      
-          </table><!--end /table-->
-          </div><!--end /tableresponsive-->
-          <div class="pagination-container mt-3 mb-3">
-            <button onclick="prevPage()" id="btn_prev"  class="btn btn-outline-success">Prev</button>
-            &nbsp;&nbsp;&nbsp;<span id="page-info"></span>&nbsp;&nbsp;&nbsp;
-            <button onclick="nextPage()" id="btn_next"  class="btn btn-outline-success">Next</button>
+
+                            <div>
+                                {{ $approve->links() }}
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
         </div>
-          </div><!--end card-body-->
-          </div>
-      
-      </div>
-          </div>
-      </div>
-      <script>
-        // JavaScript function to handle status updates
-        function updateStatus(id) {
-      // Find the checkbox using the product ID
-      var checkbox = document.querySelector('#statusid' + id + ' input[type="checkbox"]');
-      
-      // Set status to 'Active' or 'Disable' based on the checkbox state
-      var status = checkbox.checked ? 'Active' : 'Disable';
-  
-      // Send the updated status to the server using Fetch API
-      fetch('{{ route("viewstatus") }}', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              'X-CSRF-TOKEN': '{{ csrf_token() }}' // Ensure CSRF token is sent
-          },
-          body: JSON.stringify({ id: id, Action: status }) // Use 'Action' to match with the controller
-      })
-      .then(response => response.json()) // Parse the JSON response
-      .then(data => {
-          if (data.error) {
-              alert(data.error); // Show error message if there's an issue
-          } else {
-              alert('Status updated to ' + data.status); // Success message with the new status
-          }
-      })
-      .catch(error => console.error('Error:', error)); // Log any errors in the console
-  }
-  
-    </script>  
-    
-  </div> 
+    </div>
+
+    <script>
+        function downloadCSV() {
+            let table = document.getElementById("myTable");
+            let rows = table.querySelectorAll("tr");
+            let csv = [];
+
+            rows.forEach(row => {
+                let cols = row.querySelectorAll("td, th");
+                let rowData = [];
+
+                cols.forEach(col => {
+                    rowData.push('"' + col.innerText.replace(/"/g, '""') + '"');
+                });
+
+                csv.push(rowData.join(","));
+            });
+
+            let csvFile = new Blob([csv.join("\n")], { type: "text/csv" });
+            let downloadLink = document.createElement("a");
+
+            downloadLink.download = "approved_order_details.csv";
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = "none";
+
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+
+        function exportTableToExcel(tableID, filename = '') {
+            let table = document.getElementById(tableID);
+            let html = table.outerHTML.replace(/ /g, '%20');
+
+            filename = filename ? filename + '.xls' : 'excel_data.xls';
+
+            let downloadLink = document.createElement("a");
+            document.body.appendChild(downloadLink);
+
+            downloadLink.href = 'data:application/vnd.ms-excel,' + html;
+            downloadLink.download = filename;
+            downloadLink.click();
+
+            document.body.removeChild(downloadLink);
+        }
+    </script>
+</div>

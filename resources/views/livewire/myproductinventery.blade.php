@@ -29,26 +29,30 @@
                             <thead class="thead-light">
                                 <tr>
                                     <th>Product Name</th>
+                                    <th>Batch No</th>
                                     <th>Product Price</th>
-                                    <th>Product Quantity</th>
+                                    <th class="d-none">Product Quantity</th>
                                     <th>HSN Code</th>
                                     <th>Stock</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($data as $item)
-                                    @foreach($products as $product)
-                                        @if($product->id == $item->pid)
-                                            <tr>
-                                                <th scope="row">{{$product->productname}}</th>
-                                                <td>{{$product->productprice}}</td>
-                                                <td>{{$product->weightnum}}{{$product->weihgtclass}}</td>
-                                                <td>{{$product->hsncode}}</td>
-                                                <td>{{$item->inventery}}</td>
-                                            </tr>
-                                        @endif
-                                    @endforeach
-                                @endforeach
+                                @forelse ($data as $item)
+                                    <tr>
+                                        <td>{{ $item->productname ?? 'N/A' }}</td>
+                                        <td>{{ $item->batchno ?? 'N/A' }}</td>
+                                        <td>{{ $item->productprice ?? 'N/A' }}</td>
+                                        <td class="d-none">
+                                            {{ $item->weightnum ?? '' }} {{ $item->weihgtclass ?? '' }}
+                                        </td>
+                                        <td>{{ $item->hsncode ?? 'N/A' }}</td>
+                                        <td>{{ $item->inventery ?? 0 }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center">No inventory found</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -56,7 +60,6 @@
             </div>
         </div>
 
-        <!-- Status Update Script -->
         <script>
             function updateStatus(id) {
                 var checkbox = document.querySelector('#status' + id + ' input[type="checkbox"]');
@@ -89,7 +92,6 @@
             }
         </script>
 
-        <!-- Excel Export Script -->
         <script>
             function exportTableToExcel(tableID, filename = '') {
                 var table = document.getElementById(tableID);
@@ -104,7 +106,6 @@
             }
         </script>
 
-        <!-- Search Filter Script -->
         <script>
             document.getElementById("search").addEventListener("keyup", function () {
                 var input = this.value.toLowerCase();

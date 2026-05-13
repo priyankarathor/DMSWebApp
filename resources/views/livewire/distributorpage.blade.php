@@ -13,7 +13,6 @@
 
                             <div class="card-body">`
 
-                                <!-- Row 1: Second Role -->
                                 <div class="row mb-4">
                                     <div class="mb-2 col-md-3">
                                         <label for="dependence1" class="mb-2">Select User Dependence</label>
@@ -59,6 +58,7 @@
                                     </div>
                                 </div>
 
+
                                 <!-- Row 2: Main Role -->
                                 <div class="row mb-4">
                                     <div class="mb-2 col-md-3">
@@ -67,9 +67,9 @@
                                             onchange="filterDistributors('dependence2','assignid2','username2','region2')">
                                             <option class="text-center" value="">----Select Dependence----</option>
                                             @foreach ($usercategory as $item)
-                                            @if($item->category == 'main')
+                                            
                                             <option value="{{ $item->id }}">{{ $item->role }}</option>
-                                            @endif
+                                        
                                             @endforeach
                                         </select>
                                     </div>

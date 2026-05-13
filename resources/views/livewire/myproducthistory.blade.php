@@ -154,6 +154,7 @@
           <thead class="thead-light">
           <tr>
           <th>Product Name</th>
+          <th>Batch </th>
           <th>Product Quantity</th>
           <th>Product Bulk</th>
           <th>Product Amount</th>
@@ -163,7 +164,7 @@
           </thead>
           <tbody>
             @foreach ($order as $products)
-            @if($products->userid == $manage->ragisternum)
+           @if($manage && $products->userid == $manage->ragisternum)
                 @php
                     // Split comma-separated values into arrays
                     $productNames = explode(',', $products->productname);
@@ -171,15 +172,22 @@
                     $productbulk = explode(',', $products->productbulk);
                     $amount = explode(',', $products->amount);
                     $totalamount = explode(',', $products->totalamount);
+                    $batchid = explode(',', $products->	batchid);
                 @endphp
         
                 @foreach($productNames as $index => $productName)
                     <tr>
                         <td>{{ $productName }}</td>
+                        @foreach($batchtable as $batch)
+                        @if($batch->id == $batchid[$index] )
+                        <td>{{ $batch->batchno ?? '0' }}</td>
+                        @endif
+                        @endforeach
                         <td>{{ $productquantity[$index] ?? '' }}</td>
                         <td>{{ $productbulk[$index] ?? '' }}</td>
                         <td>{{ $totalamount[$index] ?? '' }}</td>
                         <td>{{ $amount[$index] ?? '' }}</td>
+
                         
                         <td>
                             <button type="button" class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#exampleModal{{ $products->id . $index }}">

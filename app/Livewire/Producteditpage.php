@@ -3,33 +3,35 @@
 namespace App\Livewire;
 
 use App\Models\productadmintab;
-use Illuminate\Http\Request;
 use App\Models\categorytable;
 use App\Models\pricetable;
-use Livewire\Component;
 use App\Models\userroletab;
+use Livewire\Component;
+use Illuminate\Http\Request;
 
 class Producteditpage extends Component
 {
     public $productedit;
     public $productprice;
+    public $selectedVehicles = [];
 
     public function mount($id)
     {
-        $this->productedit = productadmintab::find($id);
+        $this->productedit = productadmintab::findOrFail($id);
         $this->productprice = pricetable::where('pid', $id)->get();
+
+        $this->selectedVehicles = $this->productedit->vehicle
+            ? explode(',', $this->productedit->vehicle)
+            : [];
     }
 
     public function render()
     {
-        $productCategories = categorytable::get();
-        $allCategories = categorytable::all();
-        $roles = userroletab::all();
-
         return view('livewire.producteditpage', [
-            'productcate' => $productCategories,
-            'category' => $allCategories,
-            'userrole' => $roles,
+            'productcate' => categorytable::get(),
+            'category' => categorytable::all(),
+            'userrole' => userroletab::all(),
+            'selectedVehicles' => $this->selectedVehicles,
         ])->layout('layouts.header');
     }
 
@@ -39,30 +41,43 @@ class Producteditpage extends Component
 
         $product->productname = $request->productname;
         $product->description = $request->description;
-        $product->category = $request->category;
+        // $product->category = $request->category;
+
+        $product->vehicle = is_array($request->vehicle)
+            ? implode(',', $request->vehicle)
+            : $request->vehicle;
+
         $product->quantity = $request->quantity;
+        $product->measurement = $request->measurement;
+        $product->boxquantity = $request->boxquantity;
+
         $product->weightnum = $request->weightnum;
         $product->weihgtclass = $request->weightclass;
         $product->hsncode = $request->hsncode;
+
+        $product->brand = $request->brand;
+        $product->dp = $request->dp;
+        $product->mop = $request->mop;
+        $product->mrp = $request->mrp;
+        $product->totalamount = $request->totalamount;
+
         $product->link = $request->link;
         $product->metatag = $request->metatag;
         $product->metadescription = $request->metadescription;
         $product->metakeyword = $request->metakeyword;
         $product->productprice = $request->productprice;
-        $product->Action = $request->action;
-        $product->measurement = $request->measurement;
+        $product->Action = $request->action ?? 'Active';
 
-        // Handle single file upload
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('image/'), $filename);
+            $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('image'), $filename);
             $product->file = $filename;
         }
 
-        // Handle multiple images
-        $imagePaths = [];
         if ($request->hasFile('image')) {
+            $imagePaths = [];
+
             foreach ($request->file('image') as $image) {
                 if ($image->isValid()) {
                     $imageName = time() . '_' . uniqid() . '.' . $image->getClientOriginalExtension();
@@ -70,35 +85,36 @@ class Producteditpage extends Component
                     $imagePaths[] = 'images/' . $imageName;
                 }
             }
+
+            if (!empty($imagePaths)) {
+                $product->image = implode(',', $imagePaths);
+            }
         }
 
-        $product->image = implode(',', $imagePaths);
         $product->save();
 
-        // Handle price table update
         if (is_array($request->price)) {
             foreach ($request->price as $key => $price) {
+                $role = $request->role[$key] ?? null;
+
+                if ($role === null) {
+                    continue;
+                }
+
                 $priceRow = pricetable::firstOrNew([
-                    'pid' => $id,
-                    'role' => $request->role[$key] ?? null
+                    'pid' => $product->id,
+                    'role' => $role,
                 ]);
+
                 $priceRow->pid = $product->id;
-                $priceRow->role = $request->role[$key] ?? null;
+                $priceRow->role = $role;
                 $priceRow->price = $price;
                 $priceRow->Measurement = $request->measurement;
-                $priceRow->totalprice = $request->totalprice[$key] ?? null;
+                $priceRow->totalprice = $request->totalprice[$key] ?? 0;
                 $priceRow->save();
             }
-        } else {
-            $priceRow = new pricetable();
-            $priceRow->pid = $product->id;
-            $priceRow->role = $request->role;
-            $priceRow->price = $request->price;
-            $priceRow->Measurement = $request->measurement;
-            $priceRow->totalprice = $request->totalprice;
-            $priceRow->save();
         }
 
-        return redirect('productlist');
+        return redirect('productlist')->with('success', 'Product updated successfully.');
     }
 }

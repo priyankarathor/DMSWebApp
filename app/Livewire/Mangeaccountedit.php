@@ -38,7 +38,7 @@ class Mangeaccountedit extends Component
         $user->name = $data->name;
         $user->email = $data->email;
         $user->password = Hash::make($data->password); 
-        $user->role = $data->userrole; 
+        $user->role = 2; 
         $user->save();
 
         session()->flash('success', 'User data saved successfully!');

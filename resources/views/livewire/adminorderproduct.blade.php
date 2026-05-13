@@ -49,40 +49,50 @@
                                     {{-- <th>Access</th> --}}
                                 </tr>
                             </thead>
-                            <tbody>
-                                @php
-                                $orderProductIds = explode(',', $orderproduct->pid);
-                                $productBulkValues = explode(',', $orderproduct->productbulk);
-                                $productquantity = explode(',', $orderproduct->qtymasurment);
-                                $orderStatuses = explode(',', $orderproduct->orderstatus);
-                            @endphp
-                            
-                            @foreach ($products as $item)
-                                @if(in_array($item->id, $orderProductIds))
-                                    @php
-                                        // Find the index of the current product ID in the array
-                                        $index = array_search($item->id, $orderProductIds);
-                                        // Get the corresponding bulk value, quantity, and order status using the same index
-                                        $bulkValue = $productBulkValues[$index] ?? 'N/A';
-                                        $quantity = $productquantity[$index] ?? 'N/A';
-                                        $orderStatus = $orderStatuses[$index] ?? 'Pending'; // Default to 'Pending' if not found
-                                    @endphp
-                                    <tr>
-                                        <th scope="row">{{ $item->productname }}</th>
-                                        <td>{{ $item->weightnum }}{{ $item->weihgtclass }}</td>
-                                        <td>{{ $bulkValue }} {{ $quantity }}</td>
-                                        <td>
-                                            <select id="orderstatus" name="orderstatus[]" style="width: 100px; padding:5px; border-radius:10px;">
-                                                <option value="Pending" style="color:#000 !important;" {{ $orderStatus == 'Pending' ? 'selected' : '' }}>Pending</option>
-                                                <option value="Approve" style="color:#000 !important;" {{ $orderStatus == 'Approve' ? 'selected' : '' }}>Approve</option>
-                                                <option value="Cancel" style="color:#000 !important;" {{ $orderStatus == 'Cancel' ? 'selected' : '' }}>Cancel</option>
-                                            </select>
-                                        </td>
-                                    </tr>
-                                @endif
-                            @endforeach
-                            
-                            </tbody>
+                          <tbody>
+@php
+    $orderProductIds    = array_map('trim', explode(',', $orderproduct->pid));
+    $productBulkValues  = array_map('trim', explode(',', $orderproduct->productbulk));
+    $totalqtyvalue  = array_map('trim', explode(',', $orderproduct->totalqty));
+    $qtyMeasurements    = array_map('trim', explode(',', $orderproduct->qtymasurment));
+    $orderStatuses      = array_map('trim', explode(',', $orderproduct->orderstatus));
+@endphp
+
+@foreach ($orderProductIds as $index => $pid)
+    @php
+        $item = $products->where('id', (int)$pid)->first();
+        
+        $bulkValue   = $productBulkValues[$index] ?? 'N/A';
+        $totalvalue = $totalqtyvalue[$index] ?? 'N/A';
+        $quantity    = $qtyMeasurements[$index] ?? 'N/A';
+        $orderStatus = $orderStatuses[$index] ?? 'Pending';
+    @endphp
+
+    @if($item)
+        <tr>
+            <th scope="row">{{ $item->productname }}</th>
+
+            <td>{{ $bulkValue }}</td>
+
+            <td> {{$totalvalue}} {{ $quantity }}</td>
+
+            <td>
+                <select name="orderstatus[]" style="width:100px; padding:5px; border-radius:10px;">
+                    <option value="Pending" {{ strtolower($orderStatus) == 'pending' ? 'selected' : '' }}>
+                        Pending
+                    </option>
+                    <option value="Approve" {{ strtolower($orderStatus) == 'approve' ? 'selected' : '' }}>
+                        Approve
+                    </option>
+                    <option value="Cancel" {{ strtolower($orderStatus) == 'cancel' ? 'selected' : '' }}>
+                        Cancel
+                    </option>
+                </select>
+            </td>
+        </tr>
+    @endif
+@endforeach
+</tbody>
                             
                             
                         </table>

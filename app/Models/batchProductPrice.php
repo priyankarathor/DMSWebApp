@@ -4,17 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class BatchProductPrice extends Model
+class batchProductPrice extends Model
 {
     protected $fillable = [
         'pid',
         'batchno',
-        'qty',
-        'maxqty',
+        'boxqty',
+        'pcsqty',
+        'totalqty',
+        'inventoryqty',
+        'priceid'
     ];
 
     public function product()
     {
-        return $this->belongsTo(Productadmintab::class, 'pid');
+        return $this->belongsTo(productadmintab::class, 'pid');
     }
 }

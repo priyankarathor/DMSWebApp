@@ -104,7 +104,11 @@
                     <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
                         <h4 class="mb-0 fw-bold text-success">Product Full Details</h4>
 
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2 flex-wrap">
+                             <a href="{{url('/batchtracking/'.$product->id) }}" class="btn btn-outline-secondary rounded-pill px-4">
+                                Batch No Tracking
+                            </a>
+
                             <a href="{{ url()->previous() }}" class="btn btn-outline-secondary rounded-pill px-4">
                                 Back
                             </a>
@@ -112,6 +116,12 @@
                             <a href="{{ url('/productedit/'.$product->id) }}" class="btn btn-outline-success rounded-pill px-4">
                                 Edit
                             </a>
+
+                            <button type="button"
+                                class="btn btn-success rounded-pill px-4"
+                                wire:click="downloadCsv">
+                                Download Filtered CSV
+                            </button>
 
                             <button type="button"
                                 class="btn btn-outline-danger rounded-pill px-4"
@@ -187,34 +197,33 @@
 
                     <hr class="my-4">
 
-                    <div class="mb-4">
-                        <h5 class="section-title">Batch-wise Stock Details</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Search State</label>
+                            <input type="text" class="form-control" wire:model.live.debounce.500ms="stateSearch" placeholder="Search by state">
+                        </div>
 
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped align-middle">
-                                <thead class="table-success">
-                                    <tr>
-                                        <th>Sr No.</th>
-                                        <th>Batch No</th>
-                                        <th>Qty</th>
-                                        <th>Max Qty</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($product->batches as $batch)
-                                        <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $batch->batchno }}</td>
-                                            <td>{{ $batch->qty }}</td>
-                                            <td>{{ $batch->maxqty }}</td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="text-center text-muted">No batch data found</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold">Search Batch No</label>
+                            <input type="text" class="form-control" wire:model.live.debounce.500ms="batchSearch" placeholder="Search by batch no">
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Status Filter</label>
+                            <select class="form-select" wire:model.live="statusFilter">
+                                <option value="">All</option>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-2">
+                            <label class="form-label fw-bold">Vehicle Filter</label>
+                            <input type="text" class="form-control" wire:model.live.debounce.500ms="vehicleFilter" placeholder="Vehicle">
+                        </div>
+
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button class="btn btn-secondary w-100" wire:click="resetFilters">Reset</button>
                         </div>
                     </div>
 
@@ -226,7 +235,6 @@
                                 <thead class="table-success">
                                     <tr>
                                         <th>Sr No.</th>
-                                        <th>Batch No</th>
                                         <th>State</th>
                                         <th>CNDF</th>
                                         <th>Distributor</th>
@@ -236,29 +244,58 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($product->prices as $price)
+                                    @forelse($filteredPrices as $index => $price)
                                         <tr>
-                                            <td>{{ $loop->iteration }}</td>
-                                            <td>{{ $price->batchno ?? 'N/A' }}</td>
-                                            <td>{{ $price->state }}</td>
-                                            <td>₹{{ $price->pricecndf }}</td>
-                                            <td>₹{{ $price->pricedistributor }}</td>
-                                            <td>₹{{ $price->pricedealer }}</td>
-                                            <td>₹{{ $price->pricesubdealer }}</td>
-                                            <td>₹{{ $price->priceretialer }}</td>
+                                            <td>{{ $filteredPrices->firstItem() + $index }}</td>
+                                            <td>{{ $price->state ?? 'N/A' }}</td>
+                                            <td>₹{{ $price->pricecndf ?? 0 }}</td>
+                                            <td>₹{{ $price->pricedistributor ?? 0 }}</td>
+                                            <td>₹{{ $price->pricedealer ?? 0 }}</td>
+                                            <td>₹{{ $price->pricesubdealer ?? 0 }}</td>
+                                            <td>₹{{ $price->priceretialer ?? 0 }}</td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="8" class="text-center text-muted">No price data found</td>
+                                            <td colspan="7" class="text-center text-muted">No price data found</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
                         </div>
+
+                        <div class="mt-3">
+                            {{ $filteredPrices->links() }}
+                        </div>
                     </div>
 
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <h5 class="section-title">Batch-wise Price Mapping</h5>
+
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Filter Batch No</label>
+                                <input type="text"
+                                    class="form-control"
+                                    wire:model.live.debounce.500ms="batchNoFilter"
+                                    placeholder="Filter batch no">
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label fw-bold">Filter State</label>
+                                <input type="text"
+                                    class="form-control"
+                                    wire:model.live.debounce.500ms="batchStateFilter"
+                                    placeholder="Filter state">
+                            </div>
+
+                            <div class="col-md-4 d-flex align-items-end">
+                                <button type="button"
+                                    class="btn btn-success w-100"
+                                    wire:click="downloadCsv">
+                                    Download As Per Filter
+                                </button>
+                            </div>
+                        </div>
 
                         <div class="table-responsive">
                             <table class="table table-bordered table-striped align-middle">
@@ -266,8 +303,10 @@
                                     <tr>
                                         <th>Sr No.</th>
                                         <th>Batch No</th>
-                                        <th>Qty</th>
-                                        <th>Max Qty</th>
+                                        <th>Box Qty</th>
+                                        <th>PCS Qty</th>
+                                        <th>Total Pcs</th>
+                                        <th>Inventory</th>
                                         <th>State</th>
                                         <th>CNDF Price</th>
                                         <th>Distributor Price</th>
@@ -277,40 +316,31 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse($product->batches as $batch)
-                                        @php
-                                            $matchedPrices = $product->prices->where('batchno', $batch->batchno);
-                                        @endphp
+                                    @forelse($filteredBatchRows as $index => $row)
+                                        <tr>
+                                            <td>{{ $filteredBatchRows->firstItem() + $index }}</td>
+                                            <td>{{ $row['batchno'] }}</td>
+                                            <td>{{ $row['boxqty'] }}</td>
+                                            <td>{{ $row['pcsqty'] }}</td>
+                                            <td>{{ $row['totalqty'] }}</td>
+                                            <td>{{ $row['inventoryqty'] ?? '' }}</td>
 
-                                        @if($matchedPrices->count() > 0)
-                                            @foreach($matchedPrices as $matchedPrice)
-                                                <tr>
-                                                    <td>{{ $loop->parent->iteration }}</td>
-                                                    <td>{{ $batch->batchno }}</td>
-                                                    <td>{{ $batch->qty }}</td>
-                                                    <td>{{ $batch->maxqty }}</td>
-                                                    <td>{{ $matchedPrice->state ?? 'N/A' }}</td>
-                                                    <td>₹{{ $matchedPrice->pricecndf ?? 0 }}</td>
-                                                    <td>₹{{ $matchedPrice->pricedistributor ?? 0 }}</td>
-                                                    <td>₹{{ $matchedPrice->pricedealer ?? 0 }}</td>
-                                                    <td>₹{{ $matchedPrice->pricesubdealer ?? 0 }}</td>
-                                                    <td>₹{{ $matchedPrice->priceretialer ?? 0 }}</td>
-                                                </tr>
-                                            @endforeach
-                                        @else
-                                            <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $batch->batchno }}</td>
-                                                <td>{{ $batch->qty }}</td>
-                                                <td>{{ $batch->maxqty }}</td>
+                                            @if($row['pricecndf'] === '')
                                                 <td colspan="6" class="text-center text-muted">
-                                                    No price found for this batch
+                                                    {{ $row['state'] }}
                                                 </td>
-                                            </tr>
-                                        @endif
+                                            @else
+                                                <td>{{ $row['state'] }}</td>
+                                                <td>₹{{ $row['pricecndf'] }}</td>
+                                                <td>₹{{ $row['pricedistributor'] }}</td>
+                                                <td>₹{{ $row['pricedealer'] }}</td>
+                                                <td>₹{{ $row['pricesubdealer'] }}</td>
+                                                <td>₹{{ $row['priceretialer'] }}</td>
+                                            @endif
+                                        </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="10" class="text-center text-muted">
+                                            <td colspan="11" class="text-center text-muted">
                                                 No batch details found
                                             </td>
                                         </tr>
@@ -318,7 +348,12 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <div class="mt-3">
+                            {{ $filteredBatchRows->links() }}
+                        </div>
                     </div>
+
                 </div>
             </div>
         @else

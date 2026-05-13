@@ -21,7 +21,7 @@ if ($user->role == 2) {
 
 <head>
   <meta charset="utf-8" />
-    <title>RM true petroleum limited </title>
+    <title>Dealer Management System</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta content="Premium Multipurpose Admin & Dashboard Template" name="description" />
     <meta content="" name="author" />
@@ -57,15 +57,26 @@ if ($user->role == 2) {
             <!-- LOGO -->
             <div class="brand">
                 
-                <a href="{{ url('/') }}" class="logo">
-                    <span>
-                        <img src="{{ asset('image/logo-sm.png') }}" alt="logo-small" class="logo-sm">
-                    </span>
-                    <span>
-                        <img src="{{ asset('image/logo-dark.png') }}" alt="logo-large" class="logo-lg logo-light">
-                        <img src="{{ asset('image/logo-dark.png') }}" alt="logo-large" class="logo-lg logo-dark">
-                    </span>
-                </a>
+              <a href="{{ url('/') }}" class="logo mt-4 mb-2" style="display:flex; align-items:center; justify-content:center; gap:0;">
+                <span style="display:none;">
+                    <img src="{{ asset('assets/images/dmsLogo.png') }}" 
+                         alt="logo-small" 
+                         class="logo-sm"
+                         style="display:none;">
+                </span>
+            
+                <span style="display:flex; align-items:center; justify-content:center;">
+                    <img src="{{ asset('assets/images/dmsLogo.png') }}" 
+                         alt="logo-large" 
+                         class="logo-lg logo-light"
+                         style="height:45px; width:auto; display:block; object-fit:contain;">
+            
+                    <img src="{{ asset('assets/images/dmsLogo.png') }}" 
+                         alt="logo-dark" 
+                         class="logo-lg logo-dark"
+                         style="display:none;">
+                </span>
+            </a>
             </div>
         <!-- Tab panes -->
 
@@ -97,6 +108,12 @@ if ($user->role == 2) {
                                     <li class="nav-item">
                                         <a href="{{ route('approveorders') }}" class="nav-link">Approve Orders</a>
                                     </li>
+
+                                       <li class="nav-item">
+                                        <a href="{{ route('todaysell') }}" class="nav-link">Todays Sell</a>
+                                    </li>
+
+                                    
                                 </ul>
                             </div>
                         </li>
@@ -130,9 +147,15 @@ if ($user->role == 2) {
                                     <li class="nav-item">
                                         <a href="{{ route('distributorlist') }}" class="nav-link">Create Employee</a>
                                     </li>
-                                    <li class="nav-item">
-                                        <a href="{{ route('role') }}" class="nav-link">User Role</a>
+
+                                     <li class="nav-item">
+                                        <a href="{{ route('permissionlist') }}" class="nav-link">Permission Employee</a>
                                     </li>
+
+                                    
+                                    <!--<li class="nav-item">-->
+                                    <!--    <a href="{{ route('role') }}" class="nav-link">User Role</a>-->
+                                    <!--</li>-->
                                     <li class="nav-item">
                                         <a href="{{ route('userdiscount') }}" class="nav-link">User Discount</a>
                                     </li>
@@ -181,6 +204,22 @@ if ($user->role == 2) {
                                     </li><!--end nav-item-->
                                 </ul>
                             </div>
+
+                             <li class="nav-item">
+    <a class="nav-link" href="#sidebarbrand" data-bs-toggle="collapse" role="button"
+       aria-expanded="false" aria-controls="sidebarbrand">
+        <i class="fas fa-tags menu-icon"></i>
+        <span>Brand</span>
+    </a>
+
+    <div class="collapse" id="sidebarbrand">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ route('userbrand') }}">Brand List</a>
+            </li>
+        </ul>
+    </div>
+</li>
                         </li>
                         
                         <li class="menu-label mt-0 text-primary font-12 fw-semibold mt-3">S<span>tock list</span></li>
@@ -220,6 +259,11 @@ if ($user->role == 2) {
 
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('productinventery') }}"><i class="fas fa-cubes menu-icon"></i><span>My product</span></a>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('rolehierarchylist') }}"><i class="fas fa-cubes menu-icon"></i><span>Role Hierarchy</span></a>
                         </li>
 
 

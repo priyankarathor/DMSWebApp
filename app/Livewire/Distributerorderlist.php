@@ -34,6 +34,10 @@ public function getapporder(Request $data)
     $orderdata->price = $data->price;
     $orderdata->totalPrice = $data->totalPrice;
     $orderdata->grandTotal = $data->grandTotal;
+    $orderdata->priceId = $data->priceId;
+    $orderdata->batchId = $data->batchId;
+    $orderdata->sellerid = $data->sellerid;
+
     // Save the order data
     $orderdata->save();
 

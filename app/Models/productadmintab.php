@@ -3,8 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\batchProductPrice as BatchProductPrice;
+use App\Models\productPriceTable as ProductPriceTable;
 
-class Productadmintab extends Model
+class productadmintab extends Model
 {
     protected $fillable = [
         'productname',
@@ -22,6 +24,20 @@ class Productadmintab extends Model
         'metakeyword',
         'metadescription',
         'Action',
+        'measurement',
+        'totalamount',
+        'boxquantity',
+        'dp',
+        'mop',
+        'mrp',
+        'link',
+        'metatag',
+        'metakeyword',
+        'metadescription',
+        'Action',
+        'categoryid',
+        'brandid',
+        'brand'
     ];
 
     public function batches()

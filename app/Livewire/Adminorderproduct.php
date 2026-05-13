@@ -20,10 +20,15 @@ class Adminorderproduct extends Component
     }
 
     public function render()
-    {    
-        $product = productadmintab::get();
-        return view('livewire.adminorderproduct',['products'=>$product])->layout('layouts.header');
-    }
+{
+    $productIds = array_map('trim', explode(',', $this->orderproduct->pid));
+
+    $products = productadmintab::whereIn('id', $productIds)->get();
+
+    return view('livewire.adminorderproduct', [
+        'products' => $products
+    ])->layout('layouts.header');
+}
 
     public function orderupload(Request $data,$id){
         $statusupdate = orderlisttab::where('id', $id)->first();

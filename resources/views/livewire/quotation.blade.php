@@ -1,806 +1,682 @@
 <div>
-    <style>
-        *{
-             font-family: "Lato", sans-serif;
-             font-weight: <weight>;
-             font-style: normal;
-             font-size:10px;
-        }
-    </style>
-    <div class="page-wrapper">
+<style>
+@media print {
+    .no-print { display: none !important; }
+    body { margin: 0; background: #fff !important; }
+    .invoice-wrapper { margin: 0 auto !important; box-shadow: none !important; }
+}
 
-            <div class="container-fluid mt-4" style="padding: 60px;" >
-                <div class="row">
-                    <div class="col-lg-12 mx-auto">
-                        <div class="card">
-                            <div class="card-body invoice-head">
-                                <div class="row">
-                                    <meta charset="UTF-8">
-                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                    <title>Quotation</title>
-                                    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-                                        rel="stylesheet"
-                                        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
-                                        crossorigin="anonymous">
-                                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-                                        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous">
-                                    </script>
-                                    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"
-                                        integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous">
-                                    </script>
-                                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js"
-                                        integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous">
-                                    </script>
+* {
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 10px;
+}
 
-                                    <body class="border border-2 m-5">
-                                        <div class="container">
-                                            <div class="invoice-box">
-                                                <div class="row">
+body {
+    background: #eef1f4;
+}
 
-                                                    <header>
-                                                        <div class="container border border-2 border-dark">
-                                                            <div class="row">
-                                                                <div class="col-4 border-end border-2 border-dark text-center py-3">
-                                                                    <img src="{{ asset('image/vmlogo.png') }}"
-                                                                        alt="logo-small"
-                                                                        style="width: 38%; height:auto; text-align: center !important;"
-                                                                        class="mb-1 mt-1">
-                                                                </div>
-                                                                <div class="col-8 text-center py-5" style="background-color:rgb(116, 201, 50);color:rgb(255,255,255)">
-                                                                     <span><b class="display-6 fw-bold "> RM Ture Petroleum Ltd.</b> 
-                                                                     <p style="font-size:12px;">Near TTC Industrial Area ,MIDC, North Central Road,Navi Mumbai - 400701.</p></span>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-4 fs-6 border-top border-end border-2 border-dark p-3">
-                                                                    <span><b>Contact : </b></span>+91 7300428880
-                                                                </div>
-                                                                 <div class="col-4 fs-6 border-top border-end border-2 border-dark p-3">
-                                                                    <span><b>Email : </b></span>account@vandemileagerlubricant.com 
-                                                                </div>
-                                                                 <div class="col-4 fs-6 border-top border-2 border-dark p-3">
-                                                                    <span><b>GST No. : </b></span>08AHHPC4356M1Z4
-                                                                </div>
-                                                            </div>
-                                                            <div class="row">
-                                                                <div class="col-12 border-top border-2 border-dark p-3">
-                                                                    <span><b>Address : </b></span>Near TTC Industrial Area, MIDC, North Central Road, Navi Mumbai - 400701
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </header>
+.invoice-wrapper {
+    width: 794px;
+    margin: 20px auto;
+    background: #fff;
+    border: 1.5px solid #000;
+    color: #000;
+}
 
-                                                    <section>
-                                                        <div class="container-fluid px-3 my-3">
-                                                            <div class="row pb-0">
-                                                                <div class="col-3 ps-2 pt-3">
-                                                                    <span>
-                                                                        <b class="fs-5"> Invoice No. : </b> 
-                                                                            {{ $productdata->invoiceno }}
-                                                                    </span> 
-                                                                </div>
-                                                                
-                                                                <div class="col-6 text-center">
-                                                                    <h5 class="display-4 fw-bold">Quotation</h5>
-                                                                </div>
-                                                                <div class="col-3 ps-0 text-end pe-3 pt-3">
-                                                                    <span>
-                                                                        <b class="fs-5"> Date : </b> {{ $productdata->invoicedate }}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                               <div class="row border border-bottom-0 border-2 border-dark py-2 px-2">
-                                                                    <div class="col-12 ps-2 mt-3">
-                                                                          <h5><u class="fw-bolder fs-5">SUPPLIER TO</u></h5>
-                                                                    </div>
-                                                                    <div class="col-6">
-                                                                        <span>
-                                                                                <b>Consignee : </b> {{ $productdata->username }}
-                                                                        </span><br>
-                                                                        <span>
-                                                                            <b>Address : </b>    {{$productdata->address}}
-                                                                                {{$productdata->region}}
-                                                                        </span><br>
-                                                                        <span>
-                                                                            <b>GST NO. : </b>{{$productdata->gstnumber}}
-                                                                        </span>
-                                                                    </div>
-                                                                    <div class="col-6">
-                                                                        <span>
-                                                                                <b >Distributor Name : </b> {{ strtoupper($productdata->username) }}
-                                                                        </span><br>
-                                                                         <span>
-                                                                            <b>Address : </b>    {{$productdata->address}}
-                                                                                {{$productdata->region}}
-                                                                        </span><br>
-                                                                        <span>
-                                                                            <b>GST NO. : </b>{{$productdata->gstnumber}}
-                                                                        </span>
-                                                                       
-                                                                    </div>
-                                                                    
-                                                               </div>
-                                                               
-                                                                <div class="row">
-                                                                    <div class="col-6 border border-end-0 border-2 border-dark p-3">
-                                                                        <h5><u class="fw-bolder fs-5">INVOICE TO</u></h5>
-                                                                        <!--<h5><b class="fs-5">{{ $productdata->companyname }}</b></h5>-->
-                                                                        <div class="row">
-                                                                            <div class="col-4">
-                                                                                <b>Company Name</b>
-                                                                            </div>
-                                                                            <div class="col-1">
-                                                                                <b>:</b> 
-                                                                            </div>
-                                                                            <div class="col-7">
-                                                                                {{ $productdata->framname }}
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <div class="col-4">
-                                                                                <b>Phone No. </b>
-                                                                            </div>
-                                                                            <div class="col-1">
-                                                                                <b>:</b> 
-                                                                            </div>
-                                                                            <div class="col-7">
-                                                                                +91 {{ $productdata->contactno }}
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <div class="col-4">
-                                                                                <b>Email </b>
-                                                                            </div>
-                                                                            <div class="col-1">
-                                                                                <b>:</b> 
-                                                                            </div>
-                                                                            <div class="col-7">
-                                                                                {{ $productdata->email }}
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <div class="col-4">
-                                                                                <b>GST No. </b>
-                                                                            </div>
-                                                                            <div class="col-1">
-                                                                                <b>:</b> 
-                                                                            </div>
-                                                                            <div class="col-7">
-                                                                               {{ $productdata->gstnumber }}
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <div class="col-4">
-                                                                                <b>Udyam Card No. </b>
-                                                                            </div>
-                                                                            <div class="col-1">
-                                                                                <b>:</b> 
-                                                                            </div>
-                                                                            <div class="col-7">
-                                                                               {{ $productdata->udyamno }}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                     <div class="col-6 p-3 border border-2 border-dark">
-                                                                        <h5><u class="fw-bolder fs-5">TRANSPORTATION DETAILS</u></h5>
-                                                                        <div class="row">
-                                                                            <div class="col-5">
-                                                                                <b>Buyer Order No. </b>
-                                                                            </div>
-                                                                            <div class="col-1">
-                                                                                <b>:</b> 
-                                                                            </div>
-                                                                            <div class="col-6">
-                                                                                S.S Rathore
-                                                                            </div>
-                                                                        </div>
-                                                                       
-                                                                        <div class="row">
-                                                                            <div class="col-5">
-                                                                                <b>Destination</b>
-                                                                            </div>
-                                                                            <div class="col-1">
-                                                                                <b>:</b> 
-                                                                            </div>
-                                                                            <div class="col-6">
-                                                                                 {{ $productdata->region }}
-                                                                            </div>
-                                                                        </div>
-                                                                      
-                                                                      <!-- <div class="row">
-                                                                            <div class="col-5">
-                                                                                <b>Bill of Loading/R R No.</b>
-                                                                            </div>
-                                                                            <div class="col-1">
-                                                                                <b>:</b> 
-                                                                            </div>
-                                                                            <div class="col-6">
-                                                                                54563566
-                                                                            </div>
-                                                                        </div>-->
-                                                                        
-                                                                        <div class="row">
-                                                                            <div class="col-5">
-                                                                                <b>Dispatch Through</b>
-                                                                            </div>
-                                                                            <div class="col-1">
-                                                                                <b>:</b> 
-                                                                            </div>
-                                                                            <div class="col-6">
-                                                                                {{ $productdata->drivercompany }}
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <div class="col-5">
-                                                                                <b>Contact Person</b>
-                                                                            </div>
-                                                                            <div class="col-1">
-                                                                                <b>:</b> 
-                                                                            </div>
-                                                                            <div class="col-6">
-                                                                               {{ $productdata->drivername }}
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <div class="col-5">
-                                                                                <b>Vehicle No.</b>
-                                                                            </div>
-                                                                            <div class="col-1">
-                                                                                <b>:</b> 
-                                                                            </div>
-                                                                            <div class="col-6">
-                                                                                {{ $productdata->vehicleno }}
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <div class="col-5">
-                                                                                <b>Contact No.</b>
-                                                                            </div>
-                                                                            <div class="col-1">
-                                                                                <b>:</b> 
-                                                                            </div>
-                                                                            <div class="col-6">
-                                                                                +91 {{ $productdata->drivercontact }}
-                                                                            </div>
-                                                                        </div>
-                                                                        
-                                                                </div>
-                                                                </div>
-                                                            </div>
-                                                            <div class="row py-2">
-                                                                <div class="col-12">
-                                                                    <table class="table ">
-                                                                        <thead>
-                                                                            <tr class="text-center">
-                                                                                <th scope="col"
-                                                                                    class="col-1 text-white fs-6 ps-2 py-3 pe-0 border-right border-1 rounded-0"
-                                                                                    style="background-color:rgb(75,139,252)">
-                                                                                    Sr No.</th>
-                                                                                <th scope="col"
-                                                                                    class="col-4 text-white fs-6 ps-2 py-3 pe-0 border-right border-white border-1 rounded-0"
-                                                                                    style="background-color:rgb(116, 201, 50)">
-                                                                                    Item Description</th>
-                                                                                <th scope="col"
-                                                                                    class="text-white fs-6 px-2 py-3 border-right border-white border-1 rounded-0"
-                                                                                    style="background-color:rgb(75,139,252)">
-                                                                                    HSN</th>
-                                                                                <th scope="col"
-                                                                                    class="text-white fs-6 px-2 py-3 border-right border-white border-1 rounded-0"
-                                                                                    style="background-color:rgb(75,139,252)">
-                                                                                    GST RATE%</th>
-                                                                                <th scope="col"
-                                                                                    class="text-white fs-6 px-2 py-3  border-right border-white border-1 rounded-0"
-                                                                                    style="background-color:rgb(75,139,252)">
-                                                                                    QNTY</th>
-                                                                                <th scope="col"
-                                                                                    class="text-white fs-6 px-2 py-3 border-right border-white border-1 rounded-0"
-                                                                                    style="background-color:rgb(75,139,252)">
-                                                                                    RATES</th>
-                                                                                <th scope="col"
-                                                                                    class="text-white fs-6 px-2 py-3 border-right border-white border-1 rounded-0"
-                                                                                    style="background-color:rgb(75,139,252)">
-                                                                                    BOX / BKT</th>
-                                                                                <th scope="col"
-                                                                                    class="text-white fs-6 px-2 py-3 border-right border-white border-1 rounded-0"
-                                                                                    style="background-color:rgb(75,139,252)">
-                                                                                    Total</th>
-                                                                            </tr>
-                                                                        </thead>    
-                                                                    <tbody>
-                                                                        @php
-                                                                            // Check if productdata contains values before exploding
-                                                                            $productNames = $productdata->productname
-                                                                                ? explode(
-                                                                                    ',',
-                                                                                    $productdata->productname,
-                                                                                )
-                                                                                : [];
-                                                                            $hsncode = $productdata->hsnno
-                                                                                ? explode(',', $productdata->hsnno)
-                                                                                : [];
-                                                                            $Productqty = $productdata->productquantity
-                                                                                ? explode(
-                                                                                    ',',
-                                                                                    $productdata->productquantity,
-                                                                                )
-                                                                                : [];
-                                                                            $amounts = $productdata->amount
-                                                                                ? explode(',', $productdata->amount)
-                                                                                : [];
-                                                                            $productBulks = $productdata->productbulk
-                                                                                ? explode(
-                                                                                    ',',
-                                                                                    $productdata->productbulk,
-                                                                                )
-                                                                                : [];
-                                                                            $productmeasurement = $productdata->measurement
-                                                                                ? explode(
-                                                                                    ',',
-                                                                                    $productdata->measurement,
-                                                                                )
-                                                                                : [];
-                                                                            $totalAmounts = $productdata->totalamount
-                                                                                ? explode(
-                                                                                    ',',
-                                                                                    $productdata->totalamount,
-                                                                                )
-                                                                                : [];
-                                                                        @endphp
+.invoice-title {
+    text-align: center;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 2px 0;
+    border-bottom: 1.5px solid #000;
+}
 
-                                                                        @foreach ($productNames as $index => $productName)
-                                                                            <tr class="text-center">
+.top-section {
+    display: grid;
+    grid-template-columns: 58% 42%;
+    border-bottom: 1.5px solid #000;
+}
 
-                                                                                <td>{{ $index + 1 }}</td>
-                                                                                <td scope="row"
-                                                                                    class="ps-2 pt-3 fs-5">
-                                                                                    <b>{{ $productName }}</b>
-                                                                                </td>
-                                                                                <td class="ps-2 pt-4" scope="row"
-                                                                                    style="background-color:rgb(241, 241, 241)">
-                                                                                    {{ $hsncode[$index] ?? '' }}
-                                                                                </td>
-                                                                                <td class="ps-2 pt-4"
-                                                                                    style="background-color:rgb(241, 241, 241)">
-                                                                                    18 %</td>
-                                                                                <td class="ps-2 pt-4" scope="row"
-                                                                                    style="background-color:rgb(241, 241, 241)">
-                                                                                    {{ $Productqty[$index] ?? '' }}
-                                                                                </td>
-                                                                                <td class="ps-2 pt-4"
-                                                                                    style="background-color:rgb(241, 241, 241)">
-                                                                                    {{ $totalAmounts[$index] ?? '' }}
-                                                                                </td>
+.left-info {
+    border-right: 1.5px solid #000;
+}
 
-                                                                                <td class="ps-2 pt-4 "
-                                                                                    style="background-color:rgb(241, 241, 241)">
-                                                                                    {{ $productBulks[$index] ?? '' }}-  {{ $productmeasurement[$index] ?? '' }}
-                                                                                </td>
-                                                                              
-                                                                                <td class="ps-2 pt-4" scope="row"
-                                                                                    style="background-color:rgb(241, 241, 241)">
-                                                                                    {{ $amounts[$index] ?? '' }}
-                                                                                </td>
-                                                                            </tr>
-                                                                        @endforeach
-                                                               
-                                                               
+.party-box {
+    padding: 4px 6px;
+    min-height: 96px;
+    border-bottom: 1.5px solid #000;
+    line-height: 13px;
+}
+
+.party-box:last-child {
+    border-bottom: none;
+}
+
+.company-name {
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.right-grid {
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+
+.invoice-field {
+    min-height: 34px;
+    padding: 3px 5px;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    line-height: 13px;
+}
+
+.invoice-field:nth-child(2n) {
+    border-right: none;
+}
+
+.invoice-field.full {
+    grid-column: span 2;
+    min-height: 70px;
+}
+
+.label {
+    font-weight: 700;
+    display: block;
+}
+
+.goods-table,
+.tax-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.goods-table th,
+.goods-table td {
+    border-right: 1px solid #000;
+    padding: 3px 4px;
+    vertical-align: top;
+}
+
+.goods-table th {
+    text-align: center;
+    font-weight: 700;
+    border-bottom: 1px solid #000;
+}
+
+.goods-table th:last-child,
+.goods-table td:last-child {
+    border-right: none;
+}
+
+.item-row td {
+    height: 34px;
+}
+
+.item-name {
+    font-weight: 800;
+}
+
+.serial-text {
+    font-size: 9px;
+    font-weight: 500;
+    line-height: 11px;
+    margin-left: 8px;
+}
+
+.blank-space td {
+    height: 125px;
+}
+
+.tax-line td {
+    height: 18px;
+    font-weight: 700;
+}
+
+.total-row td {
+    border-top: 1.5px solid #000;
+    border-bottom: 1.5px solid #000;
+    height: 24px;
+    font-weight: 800;
+}
+
+.words-box {
+    padding: 4px 6px;
+    border-bottom: 1.5px solid #000;
+    line-height: 14px;
+}
+
+.tax-table th,
+.tax-table td {
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    padding: 2px 4px;
+    text-align: right;
+}
+
+.tax-table th {
+    text-align: center;
+    font-weight: 700;
+}
+
+.tax-table th:last-child,
+.tax-table td:last-child {
+    border-right: none;
+}
+
+.bottom-section {
+    display: grid;
+    grid-template-columns: 52% 48%;
+    min-height: 82px;
+}
+
+.declaration-box {
+    padding: 5px 6px;
+    border-right: 1.5px solid #000;
+    line-height: 13px;
+}
+
+.signature-box {
+    padding: 5px 6px;
+    position: relative;
+    line-height: 13px;
+}
+
+.sign-company {
+    text-align: right;
+    font-weight: 800;
+}
+
+.sign-text {
+    position: absolute;
+    right: 8px;
+    bottom: 6px;
+    font-weight: 700;
+}
+
+.footer-note {
+    text-align: center;
+    border-top: 1.5px solid #000;
+    padding: 3px;
+    font-weight: 700;
+}
+
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.bold { font-weight: 800; }
+
+.print-btn {
+    display: block;
+    margin: 20px auto;
+    padding: 9px 20px;
+    border: none;
+    background: #111;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+</style>
+
 @php
-    // Explode and convert to float
-    $totalAmountsArray = array_map('floatval', explode(',', $productdata->amount));
-    $totalDue = array_sum($totalAmountsArray);
+function invArr($value) {
+    if (!$value) return [];
+    return array_map('trim', explode(',', $value));
+}
 
-    // Calculate CGST, SGST, IGST
-    $cgst = $totalDue * 0.09;
-    $sgst = $totalDue * 0.09;
-    $igst = $totalDue * 0.18;
+function moneyFmt($amount) {
+    return number_format((float)$amount, 2);
+}
 
-    // Calculate Total After Tax
-    $totalAfterTax = $totalDue + $cgst + $sgst;
+function indianWords($number) {
+    $number = round((float)$number);
 
-    // Apply discount (force discount to float)
-    $discount = floatval($productdata->discount);
-    $discountedTotal = $totalAfterTax - ($totalAfterTax * ($discount / 100));
+    $words = [
+        0 => '', 1 => 'One', 2 => 'Two', 3 => 'Three', 4 => 'Four',
+        5 => 'Five', 6 => 'Six', 7 => 'Seven', 8 => 'Eight', 9 => 'Nine',
+        10 => 'Ten', 11 => 'Eleven', 12 => 'Twelve', 13 => 'Thirteen',
+        14 => 'Fourteen', 15 => 'Fifteen', 16 => 'Sixteen',
+        17 => 'Seventeen', 18 => 'Eighteen', 19 => 'Nineteen',
+        20 => 'Twenty', 30 => 'Thirty', 40 => 'Forty', 50 => 'Fifty',
+        60 => 'Sixty', 70 => 'Seventy', 80 => 'Eighty', 90 => 'Ninety'
+    ];
 
-    // Round-off calculations
-    $roundedTotal = round($discountedTotal);
-    $roundOffValue = $discountedTotal - $roundedTotal;
+    $two = function($n) use ($words) {
+        if ($n == 0) return '';
+        if ($n < 20) return $words[$n];
 
-    // Explode arrays again with float conversion
-    $totalAmountsArray = array_map('floatval', explode(',', $productdata->amount));
-    $totalDue = array_sum($totalAmountsArray);
+        return trim($words[floor($n / 10) * 10] . ' ' . $words[$n % 10]);
+    };
 
-    $cgstArray = array_map('floatval', explode(',', $productdata->cgst));
-    $sgstArray = array_map('floatval', explode(',', $productdata->sgst));
-    $igstArray = array_map('floatval', explode(',', $productdata->igst));
+    if ($number == 0) return 'Zero Only';
 
-    // Sum of taxes
-    $totalCgst = array_sum($cgstArray);
-    $totalSgst = array_sum($sgstArray);
-    $totalIgst = array_sum($igstArray);
+    $out = '';
 
-    // Grand Totals
-    $grandTotal = $totalCgst + $totalSgst + $totalIgst;
-    $grandTotales = $totalDue + $totalCgst + $totalSgst + $totalIgst;
+    $crore = floor($number / 10000000);
+    $number %= 10000000;
+
+    $lakh = floor($number / 100000);
+    $number %= 100000;
+
+    $thousand = floor($number / 1000);
+    $number %= 1000;
+
+    $hundred = floor($number / 100);
+    $number %= 100;
+
+    if ($crore) $out .= $two($crore) . ' Crore ';
+    if ($lakh) $out .= $two($lakh) . ' Lakh ';
+    if ($thousand) $out .= $two($thousand) . ' Thousand ';
+    if ($hundred) $out .= $words[$hundred] . ' Hundred ';
+    if ($number) $out .= $two($number) . ' ';
+
+    return trim($out) . ' Only';
+}
+
+$productNames = invArr($productdata->productname ?? '');
+$hsnCodes     = invArr($productdata->hsnno ?? '');
+$quantities   = invArr($productdata->productquantity ?? '');
+$rates        = invArr($productdata->rate ?? $productdata->totalamount ?? '');
+$amounts      = invArr($productdata->amount ?? '');
+$measurements = invArr($productdata->measurement ?? '');
+$serials      = invArr($productdata->serialno ?? '');
+
+$subTotal = array_sum(array_map('floatval', $amounts));
+
+$cgstRate = 9;
+$sgstRate = 9;
+
+$cgst = ($subTotal * $cgstRate) / 100;
+$sgst = ($subTotal * $sgstRate) / 100;
+
+$totalTax = $cgst + $sgst;
+
+$totalIncludingTax = $subTotal + $totalTax;
+
+$userDiscountRate = (float)($productdata->user_discount_rate ?? 0);
+$roleDiscountRate = (float)($productdata->role_discount_rate ?? 0);
+
+$userDiscountAmount = ($totalIncludingTax * $userDiscountRate) / 100;
+
+$afterUserDiscount = $totalIncludingTax - $userDiscountAmount;
+
+$roleDiscountAmount = ($afterUserDiscount * $roleDiscountRate) / 100;
+
+$totalDiscount = $userDiscountAmount + $roleDiscountAmount;
+
+$finalBeforeRound = $totalIncludingTax - $totalDiscount;
+$finalTotal = round($finalBeforeRound);
+$roundOff = $finalTotal - $finalBeforeRound;
+
+$totalQty = array_sum(array_map('floatval', $quantities));
 @endphp
 
+<div class="invoice-wrapper" id="invoiceArea">
 
+    <div class="invoice-title">Tax Invoice</div>
 
-                                                                    <tr class="border-bottom border-top"
-                                                                        style="border-bottom-width: 20px;border-top-width: 20px;">
-                                                                        <td class=" py-3" rowspan="4"
-                                                                            colspan="3">
-                                                                            <span class="fs-5 fw-bold">Amount In Words</span>
-                                                                            <h4 class="fw-bold" style="color:rgb(116, 201, 50)"
-                                                                                id="amountInWords"></h4>
-                                                                            <!-- Display the total sum -->
-                                                                        </td><br />
-<script>
-    function convertToWords(num) {
-        const ones = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven",
-            "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"
-        ];
-        const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+    <div class="top-section">
+        <div class="left-info">
+            <div class="party-box">
+                <div class="company-name">JAJOT MARKETING PVT LTD</div>
+                <div>BA/F, FOYSAGAR ROAD</div>
+                <div>AJMER</div>
+                <div>Rajasthan - 305001, India</div>
+                <div><b>GSTIN/UIN:</b> 08AAFCJ9229C1ZJ</div>
+                <div><b>State Name:</b> Rajasthan, Code : 08</div>
+                <div><b>CIN:</b> U74999RJ2018PTC062266</div>
+            </div>
 
-        function twoDigitWord(n) {
-            if (n < 20) {
-                return ones[n];
-            } else {
-                return tens[Math.floor(n / 10)] + (n % 10 !== 0 ? " " + ones[n % 10] : "");
-            }
-        }
+            <div class="party-box">
+                <div><b>Consignee (Ship to)</b></div>
+                <div class="company-name">{{ strtoupper($productdata->username ?? 'N/A') }}</div>
+                <div>{{ $productdata->address ?? '' }}</div>
+                <div>{{ $productdata->city ?? '' }} {{ $productdata->pincode ?? '' }}</div>
+                <div><b>GSTIN/UIN:</b> {{ $productdata->gstnumber ?? 'N/A' }}</div>
+                <div><b>State Name:</b> {{ $productdata->region ?? 'Rajasthan' }}, Code : 08</div>
+            </div>
 
-        function threeDigitWord(n) {
-            const hundredPart = Math.floor(n / 100);
-            const remainder = n % 100;
-            const hundredText = hundredPart > 0 ? ones[hundredPart] + " hundred" : "";
-            const remainderText = remainder > 0 ? " " + twoDigitWord(remainder) : "";
-            return hundredText + remainderText;
-        }
+            <div class="party-box">
+                <div><b>Buyer (Bill to)</b></div>
+                <div class="company-name">{{ strtoupper($productdata->framname ?? $productdata->username ?? 'N/A') }}</div>
+                <div>{{ $productdata->address ?? '' }}</div>
+                <div>{{ $productdata->city ?? '' }} {{ $productdata->pincode ?? '' }}</div>
+                <div><b>GSTIN/UIN:</b> {{ $productdata->gstnumber ?? 'N/A' }}</div>
+                <div><b>State Name:</b> {{ $productdata->region ?? 'Rajasthan' }}, Code : 08</div>
+                <div><b>Place of Supply:</b> {{ $productdata->region ?? 'Rajasthan' }}</div>
+            </div>
+        </div>
 
-        function numToWords(n) {
-            if (n === 0) return "zero";
+        <div class="right-grid">
+            <div class="invoice-field">
+                <span class="label">Invoice No.</span>
+                {{ $productdata->invoiceno ?? 'N/A' }}
+            </div>
 
-            let crore = Math.floor(n / 10000000);
-            n %= 10000000;
-            let lakh = Math.floor(n / 100000);
-            n %= 100000;
-            let thousand = Math.floor(n / 1000);
-            n %= 1000;
-            let hundred = n;
+            <div class="invoice-field">
+                <span class="label">Dated</span>
+                {{ $productdata->invoicedate ?? date('d-M-y') }}
+            </div>
 
-            let result = "";
+            <div class="invoice-field">
+                <span class="label">Delivery Note</span>
+                {{ $productdata->deliverynote ?? '' }}
+            </div>
 
-            if (crore > 0) result += `${twoDigitWord(crore)} crore `;
-            if (lakh > 0) result += `${twoDigitWord(lakh)} lakh `;
-            if (thousand > 0) result += `${twoDigitWord(thousand)} thousand `;
-            if (hundred > 0) result += threeDigitWord(hundred);
+            <div class="invoice-field">
+                <span class="label">Mode/Terms of Payment</span>
+                {{ $productdata->paymentterms ?? '' }}
+            </div>
 
-            return result.trim() + " only";
-        }
+            <div class="invoice-field">
+                <span class="label">Reference No. & Date.</span>
+                {{ $productdata->referenceno ?? '' }}
+            </div>
 
-        return numToWords(Math.floor(num));
-    }
+            <div class="invoice-field">
+                <span class="label">Other References</span>
+                {{ $productdata->otherreferences ?? '' }}
+            </div>
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const totalAmount = parseFloat("{{ $discountedTotal }}"); // Pass from Blade
-        const amountInWords = convertToWords(totalAmount);
-        document.getElementById("amountInWords").textContent = amountInWords.charAt(0).toUpperCase() + amountInWords.slice(1);
-    });
-</script>
+            <div class="invoice-field">
+                <span class="label">Buyer Order No.</span>
+                {{ $productdata->buyerorderno ?? '' }}
+            </div>
 
-                                                                    </tr>
-                                                                    
-                                                                    
-                                                                    <tr class="text-center">
-                                                                        <td colspan="5"
-                                                                            style="background-color:rgb(196, 192, 192)">
-                                                                            <div class="row justify-content-center py-2">
-                                                                               <div class="col-4">
-                                                                                    Total Amount 
-                                                                               </div>
-                                                                               <div class="col-1"> : </div>
-                                                                               <div class="col-2">
-                                                                                   {{ $totalDue }}
-                                                                               </div>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
+            <div class="invoice-field">
+                <span class="label">Dated</span>
+                {{ $productdata->buyerorderdate ?? '' }}
+            </div>
 
-                                                                    <tr class="text-center">
-                                                                        <td colspan="5"
-                                                                            style="background-color:rgb(196, 192, 192)">
-                                                                             <div class="row justify-content-center py-2">
-                                                                               <div class="col-4">
-                                                                                    CGST (9%) 
-                                                                            
-                                                                               </div>
-                                                                               <div class="col-1"> : </div>
-                                                                               <div class="col-2">
-                                                                                   {{ number_format($totalDue * 0.09, 2) }}
-                                                                               </div>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
+            <div class="invoice-field">
+                <span class="label">Dispatch Doc No.</span>
+                {{ $productdata->dispatchdocno ?? '' }}
+            </div>
 
-                                                                    <tr class="text-center">
-                                                                        <td colspan="5"
-                                                                            style="background-color:rgb(196, 192, 192)">
-                                                                             <div class="row justify-content-center py-2">
-                                                                               <div class="col-4">
-                                                                                    SGST (9%) 
-                                                                               </div>
-                                                                                <div class="col-1"> : </div>
-                                                                               <div class="col-2">
-                                                                                   {{ number_format($totalDue * 0.09, 2) }}
-                                                                               </div>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                      
-                                                                     <tr>
-                                                                        <td class="align-top" rowspan="4" colspan="3" style="border-bottom:5px solid rgb(116, 201, 50)">
-                                                                           <div class="row py-2">
-                                                                               <span class="fs-5 fw-bold">Company Account Details</span>
-                                                                           </div>
-                                                                           <div class="row">
-                                                                               <div class="col-3">
-                                                                                   <b>Company Name </b>
-                                                                               </div>
-                                                                               <div class="col-1">
-                                                                                  <b>:</b> 
-                                                                               </div>
-                                                                                <div class="col-8">
-                                                                                   RM TRUE PATROLEUM LTD 
-                                                                               </div>
-                                                                           </div>
-                                                                           <div class="row">
-                                                                               <div class="col-3">
-                                                                                   <b>Bank Name </b>
-                                                                               </div>
-                                                                               <div class="col-1">
-                                                                                  <b>:</b> 
-                                                                               </div>
-                                                                                <div class="col-8">
-                                                                                 ICICI BANK A/C No. 441405000022 
-                                                                               </div>
-                                                                           </div>
-                                                                           <div class="row">
-                                                                               <div class="col-3">
-                                                                                   <b>A/C No. </b>
-                                                                               </div>
-                                                                               <div class="col-1">
-                                                                                  <b>:</b> 
-                                                                               </div>
-                                                                                <div class="col-8">
-                                                                                    441405000022 
-                                                                               </div>
-                                                                           </div>
-                                                                            <div class="row">
-                                                                               <div class="col-3">
-                                                                                   <b>IFSC CODE </b>
-                                                                               </div>
-                                                                               <div class="col-1">
-                                                                                  <b>:</b> 
-                                                                               </div>
-                                                                                <div class="col-8">
-                                                                                   ICIC0004414
-                                                                               </div>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                     
-                                                                    <tr class="text-center">
-                                                                        <td colspan="5"
-                                                                            style="background-color:rgb(196, 192, 192)">
-                                                                            <div class="row justify-content-center">
-                                                                               <div class="col-4">
-                                                                                    IGST (18%) 
-                                                                               </div>
-                                                                               <div class="col-1"> : </div>
-                                                                               <div class="col-2">
-                                                                                   {{ number_format($totalDue * 0.18, 2) }}
-                                                                               </div>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
+            <div class="invoice-field">
+                <span class="label">Delivery Note Date</span>
+                {{ $productdata->deliverynotedate ?? '' }}
+            </div>
 
-                                                                    
-                                                                    <tr class="text-center">
-                                                                        <td colspan="6" style="background-color:rgb(196, 192, 192)">
-                                                                            <span>Total After Tax</span>:
-                                                                            <span>{{ number_format($totalAfterTax, 2) }}</span>
-                                                                        </td>
-                                                                    </tr>
-                                                                    
-                                                                    <tr class="text-center">
-                                                                        <td colspan="6" style="background-color:rgb(196, 192, 192)">
-                                                                            <span>Discount</span>:
-                                                                            <span>{{ $productdata->discount }} %</span>
-                                                                        </td>
-                                                                    </tr>
-                                                                   
-                                                                    <tr class="text-center">
-                                                                        <td colspan="3">
-                                                                           
-                                                                        </td>
-                                                                        <td colspan="5" style="background-color:rgb(196, 192, 192)">
-                                                                            <span>Discounted Total</span>:
-                                                                            <span>{{ number_format($discountedTotal,2) }}</span>
-                                                                        </td>
-                                                                    </tr>
-                                                                 
-                                                                    {{-- <tr class="text-center">
-                        <td colspan="5" style="background-color:rgb(196, 192, 192)">
-                            <span><b>Total GST Amount</b></span>:
-                            <span><b>{{ number_format(($totalDue * 0.09 * 2) + ($totalDue * 0.18), 2) }}</b></span>
-                        </td>
-                    </tr> --}}
+            <div class="invoice-field">
+                <span class="label">Dispatched through</span>
+                {{ $productdata->drivercompany ?? '' }}
+            </div>
 
-                                                                    @php
-                                                                        $roundedTotal = round($grandTotal); // Calculate the rounded value of the total amount
-                                                                        $roundOffValue =
-                                                                            $grandTotal - $roundedTotal; // Calculate the round off value
-                                                                        $grandTotalWithRoundOff = $roundedTotal; // Use the rounded total in Grand Total
-                                                                    @endphp
-                                                                    <tr class="text-center">
-                                                                        <td colspan="3">
-                                                                           
-                                                                        </td>
-                                                                        <td colspan="5"
-                                                                            style="background-color:rgb(196, 192, 192)">
-                                                                            <div class="row justify-content-center">
-                                                                               <div class="col-4">
-                                                                                    Round Off 
-                                                                               </div>
-                                                                                <div class="col-1"> : </div>
-                                                                               <div class="col-2">
-                                                                                   {{ number_format(fmod(round($totalDue * 0.18 + $totalDue, 2), 1), 2) }}
+            <div class="invoice-field">
+                <span class="label">Destination</span>
+                {{ $productdata->destination ?? $productdata->region ?? '' }}
+            </div>
 
-                                                                               </div>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr>
-                                                                    {{-- <tr class="text-center">
-                                                                        <td colspan="5"
-                                                                            style="background-color:rgb(196, 192, 192)">
-                                                                            <div class="row justify-content-center">
-                                                                               <div class="col-4">
-                                                                                    Grand Total 
-                                                                               </div>
-                                                                                <div class="col-1"> : </div>
-                                                                               <div class="col-2">
-                                                                                {{ number_format($discountedTotal,2) }}
-                                                                                </div>
-                                                                            </div>
-                                                                        </td>
-                                                                    </tr> --}}
-                                                                    <tr>
-                                                                    <td style="border:none" class="pt-3"
-                                                                        colspan="3">
-                                                                        <h4 class="ps-2 fw-bold" style="color:rgb(75,139,252)">Thank you
-                                                                            for your business</h4>
-                                                                        <h5 class="ps-4 fw-bold pt-3">Terms & conditions
-                                                                        </h5>
-                                                                    </td>
-                                                                    <td colspan="5"
-                                                                        class="text-center p-0 align-top"
-                                                                        >
-                                                                        <div class="p-2" style="background-color:rgb(75,139,252);color:rgb(255,255,255)">
-                                                                            <span class="fs-2 fw-bold">GRAND
-                                                                            TOTAL</span>
-                                                                        <span class="fs-2 fw-bold"> : </span>
-                                                                        <span class="fs-2 fw-bold">
-                                                                            ₹{{ number_format($discountedTotal,2) }} /-
-                                                                        </span>
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                                </tbody>
-                                                            </table>
-                                                            <!--<table style="width: 100%">-->
-                                                            <!--    <tr>-->
-                                                            <!--        <td style="border:none" class="pt-3"-->
-                                                            <!--            colspan="5">-->
-                                                            <!--            <h4 class="text-info ps-2">Thank you-->
-                                                            <!--                for your business</h4>-->
-                                                            <!--            <h6 class="ps-2">Terms & conditions-->
-                                                            <!--            </h6>-->
-                                                            <!--        </td>-->
-                                                            <!--        <td colspan="9"-->
-                                                            <!--            class="text-center pt-3"-->
-                                                            <!--            style="background-color:rgb(75,139,252);color:rgb(116, 201, 50)">-->
-                                                            <!--            <span class="fs-3 fw-bold">GRAND-->
-                                                            <!--                TOTAL</span>-->
-                                                            <!--            <span class="fs-3 fw-bold"> : </span>-->
-                                                            <!--            <span class="fs-3 fw-bold">-->
-                                                            <!--                {{ $grandTotales }}-->
-                                                            <!--            </span>-->
-                                                            <!--        </td>-->
-                                                            <!--    </tr>-->
-                                                            <!--</table>-->
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </section>
-
-                                            <footer>
-                                                <!--<div
-                                                    class="container-fluid p-4 border-top border-dark border-2">
-                                                    <div class="row">
-                                                        <div class="col-4 pt-3">
-                                                            <h3 class="fs-4 fw-bold"><u>PAYMENT METHODS</u></h3>
-                                                            <span class="fw-bold">Paypal :</span>
-                                                            <span>info@bizzgrow@company.email.com</span><br>
-                                                            <span class="fw-bold">Payment :</span>
-                                                            <span>Visa Master card we accept cheque</span>
-                                                        </div>
-                                                        <div class="col-4">
-
-                                                        </div>
-                                                        <div class="col-4">
-                                                            <u class="fs-3"><i>Mic Johnson</i></u>
-                                                            <h3 class="fw-bold">Michale Johnson</h3>
-                                                            <span>
-                                                                Managing Director , Company Name INC.
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="row mt-5" style="color:rgb(116, 201, 50);">
-                                                        <div class="col-4 text-center mt-4">
-                                                            <h5 class="py-2 fw-bold">Customer's Signature</h5>
-                                                        </div>
-                                                        <div class="col-4">
-                                                        </div>
-                                                        <div class="col-4 text-center mt-4">
-                                                            <h5 class="py-2 fw-bold">Manager's Signature</h5>
-                                                        </div>
-                                                    </div>
-                                                </div>-->
-                                            </footer>
-
-
-                                        </div>
-
-                                    </div>
-                                    <div class="container">
-                                        <div class="row">
-                                            <div class="col-md-12">
-                                                <button id="download-btn"
-                                                    class="btn btn-outline-success mt-5 mb-5"
-                                                    style="float:right;">Download PDF</button>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <script>
-                                        document.getElementById("download-btn").addEventListener("click", function() {
-                                            var element = document.querySelector(".invoice-box");
-                                            html2pdf(element, {
-                                                margin: 10,
-                                                filename: 'Vande Mileager Lubricant Pvt Ltd.pdf',
-                                                image: {
-                                                    type: 'jpeg',
-                                                    quality: 0.98
-                                                },
-                                                html2canvas: {
-                                                    scale: 2
-                                                },
-                                                jsPDF: {
-                                                    unit: 'mm',
-                                                    format: 'a4',
-                                                    orientation: 'portrait'
-                                                }
-                                            });
-                                        });
-                                    </script>
-                                    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-                            </body>
-                        </div>
-                    </div>
-                </div>
+            <div class="invoice-field full">
+                <span class="label">Terms of Delivery</span>
+                {{ $productdata->termsofdelivery ?? '' }}
             </div>
         </div>
     </div>
-</div>
+
+    <table class="goods-table">
+        <thead>
+            <tr>
+                <th style="width:4%;">Sl<br>No.</th>
+                <th style="width:37%;">Description of Goods</th>
+                <th style="width:9%;">HSN/SAC</th>
+                <th style="width:9%;">Quantity</th>
+                <th style="width:9%;">Rate<br><small>(Incl. of Tax)</small></th>
+                <th style="width:9%;">Rate</th>
+                <th style="width:5%;">per</th>
+                <th style="width:5%;">Disc. %</th>
+                <th style="width:13%;">Amount</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach($productNames as $index => $productName)
+                @php
+                    $qty = (float)($quantities[$index] ?? 0);
+                    $amt = (float)($amounts[$index] ?? 0);
+
+                    $rateWithoutTax = $qty > 0 ? $amt / $qty : 0;
+
+                    $lineTax = $amt * 18 / 100;
+                    $lineAmountWithTax = $amt + $lineTax;
+
+                    $rateInclTax = $qty > 0 ? $lineAmountWithTax / $qty : 0;
+                @endphp
+
+                <tr class="item-row">
+                    <td class="text-center">{{ $index + 1 }}</td>
+
+                    <td>
+                        <div class="item-name">{{ $productName }}</div>
+
+                        @if(!empty($serials[$index]))
+                            <div class="serial-text">{{ $serials[$index] }}</div>
+                        @endif
+                    </td>
+
+                    <td class="text-center">{{ $hsnCodes[$index] ?? '' }}</td>
+
+                    <td class="text-right bold">
+                        {{ $quantities[$index] ?? '' }}
+                    </td>
+
+                    <td class="text-right">{{ moneyFmt($rateInclTax) }}</td>
+
+                    <td class="text-right">{{ moneyFmt($rateWithoutTax) }}</td>
+
+                    <td class="text-center">{{ $measurements[$index] ?? 'Pcs.' }}</td>
+
+                    <td class="text-center"></td>
+
+                    <td class="text-right bold">{{ moneyFmt($amt) }}</td>
+                </tr>
+            @endforeach
+
+            <tr class="blank-space">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+
+            <tr class="tax-line">
+                <td></td>
+                <td class="text-right">Original Amount</td>
+                 <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                <td class="text-right">{{ moneyFmt($subTotal) }}</td>
+            </tr>
+
+            <tr class="tax-line">
+                <td></td>
+                <td class="text-right">CGST</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="text-right">{{ $cgstRate }}</td>
+                <td class="text-center">%</td>
+                <td></td>
+                <td class="text-right">{{ moneyFmt($cgst) }}</td>
+            </tr>
+
+            <tr class="tax-line">
+                <td></td>
+                <td class="text-right">SGST</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="text-right">{{ $sgstRate }}</td>
+                <td class="text-center">%</td>
+                <td></td>
+                <td class="text-right">{{ moneyFmt($sgst) }}</td>
+            </tr>
+
+            <tr class="tax-line">
+                <td></td>
+                <td class="text-right">Total Value Including Tax</td>
+                <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                <td class="text-right bold">{{ moneyFmt($totalIncludingTax) }}</td>
+            </tr>
+
+            @if($userDiscountRate > 0)
+                <tr class="tax-line">
+                    <td></td>
+                    <td class="text-right">User Discount </td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style="padding:5px;">{{ moneyFmt($userDiscountRate) }}% </td>
+                    <td class="text-right">- {{ moneyFmt($userDiscountAmount) }}</td>
+                </tr>
+            @endif
+
+            @if($roleDiscountRate > 0)
+                <tr class="tax-line">
+                    <td></td>
+                    <td class="text-right">Role Discount</td>
+                     <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style="padding:5px;"> {{ moneyFmt($roleDiscountRate) }}%</td>
+                    <td class="text-right">- {{ moneyFmt($roleDiscountAmount) }}</td>
+                </tr>
+            @endif
+
+            @if($totalDiscount > 0)
+                <tr class="tax-line">
+                    <td></td>
+                    <td class="text-right">Total Discount</td>
+                      <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td class="text-right">- {{ moneyFmt($totalDiscount) }}</td>
+                </tr>
+            @endif
+
+            <tr class="tax-line">
+                <td></td>
+                <td class="text-right">Round Off</td>
+                  <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                <td class="text-right">{{ moneyFmt($roundOff) }}</td>
+            </tr>
+
+            <tr class="total-row">
+                <td></td>
+                <td class="text-right">Final Total</td>
+                <td></td>
+                <td class="text-right">{{ $totalQty }} Pcs.</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td class="text-right">₹ {{ moneyFmt($finalTotal) }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="words-box">
+        <div>
+            Amount Chargeable (in words)
+            <span style="float:right;">E. &amp; O.E</span>
+        </div>
+        <div class="bold">INR {{ indianWords($finalTotal) }}</div>
+    </div>
+
+    <table class="tax-table">
+        <thead>
+            <tr>
+                <th style="width:25%;">HSN/SAC</th>
+                <th style="width:15%;">Taxable<br>Value</th>
+                <th style="width:10%;">CGST<br>Rate</th>
+                <th style="width:15%;">CGST<br>Amount</th>
+                <th style="width:10%;">SGST/UTGST<br>Rate</th>
+                <th style="width:15%;">SGST/UTGST<br>Amount</th>
+                <th style="width:10%;">Total<br>Tax Amount</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            <tr>
+                <td class="text-left">{{ $hsnCodes[0] ?? '85171400' }}</td>
+                <td>{{ moneyFmt($subTotal) }}</td>
+                <td>{{ $cgstRate }}%</td>
+                <td>{{ moneyFmt($cgst) }}</td>
+                <td>{{ $sgstRate }}%</td>
+                <td>{{ moneyFmt($sgst) }}</td>
+                <td>{{ moneyFmt($totalTax) }}</td>
+            </tr>
+
+            <tr class="bold">
+                <td>Total</td>
+                <td>{{ moneyFmt($subTotal) }}</td>
+                <td></td>
+                <td>{{ moneyFmt($cgst) }}</td>
+                <td></td>
+                <td>{{ moneyFmt($sgst) }}</td>
+                <td>{{ moneyFmt($totalTax) }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="words-box">
+        <div>
+            Tax Amount (in words) :
+            <b>INR {{ indianWords($totalTax) }}</b>
+        </div>
+    </div>
+
+    <div class="bottom-section">
+        <div class="declaration-box">
+            <div><b>Company's PAN</b> : AAFCJ9229C</div>
+            <br>
+            <div><b>Declaration</b></div>
+            <div>
+                Goods once sold will not be taken back. Subject to Ajmer Jurisdiction.
+                Interest @18% p.a. will be charged if the payment is not made within due date.
+            </div>
+        </div>
+
+        <div class="signature-box">
+            <div class="sign-company">for JAJOT MARKETING PVT LTD</div>
+            <div class="sign-text">Authorised Signatory</div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        This is a Computer Generated Invoice
+    </div>
 </div>
 
+<button class="print-btn no-print" onclick="window.print()">
+    Print / Download Invoice
+</button>
+
+</div>

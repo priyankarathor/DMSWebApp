@@ -6,9 +6,30 @@ use Livewire\Component;
 use App\Models\userhierarchytab;
 use App\Models\userroletab;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
 
 class Distributorpage extends Component
 {
+   public $user;
+public $userId;
+public $role;
+public $userrole;
+
+public function mount()
+{
+    $this->user = Auth::user();
+
+    $this->userId = $this->user ? $this->user->id : null;
+    $this->role = $this->user ? $this->user->role : null;
+
+    // ✅ FIX HERE
+    $this->userrole = $this->user ? $this->user->userrole : null;
+
+    // dd($this->userId);
+}
+ 
+
     public function render()
     {
         $usercategory = userroletab::get();
@@ -127,7 +148,6 @@ class Distributorpage extends Component
         $registerId = $prefix . '-' . str_pad($nextNumber, 2, '0', STR_PAD_LEFT);
 
         $userdeatil = new userhierarchytab();
-
         $userdeatil->zonalId = $request->zonalId;
         $userdeatil->rgid = $request->distributorId;
         $userdeatil->registerid = $registerId;
@@ -153,6 +173,10 @@ class Distributorpage extends Component
         $userdeatil->holdername = $request->holdername;
         $userdeatil->accounttype = $request->accounttype;
         $userdeatil->udyamcard = $request->udyamcard;
+
+        $userdeatil->active = 'deactivate';
+
+        $userdeatil->userId = $request->userId;
 
         if ($request->hasFile('file')) {
             $imageName = time() . '.' . $request->file('file')->extension();

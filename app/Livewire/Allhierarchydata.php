@@ -79,7 +79,7 @@ class Allhierarchydata extends Component
 
     public function render()
     {
-        $users = userhierarchytab::all();
+        $users = userhierarchytab::where('active', 'Active')->get();
         $categories = userroletab::all()->keyBy('id');
 
         return view('livewire.allhierarchydata', [

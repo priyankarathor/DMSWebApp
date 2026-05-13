@@ -58,10 +58,21 @@ use App\Models\subdealertable;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductCsvController;
 
+use App\Livewire\Stockholder;
 use App\Livewire\Productdetails;
 
+use App\Livewire\Rolehierarchy;
 
+use App\Livewire\Companypermission;
+use App\Livewire\Managepermission;
+
+use App\Livewire\Roledistributiion;
 use App\Livewire\ProductCsvImport;
+use App\Livewire\Todaysell;
+use App\Livewire\Trackingbystate;
+use App\Livewire\BatchRoleTracking;
+use App\Livewire\Brandadd;
+use App\Livewire\Userstockdetails;
 
 Route::middleware([
     'auth:sanctum',
@@ -77,9 +88,21 @@ Route::get('/productlist',Productpagelist::class)->name('productlist');
 Route::get('/productDetails/{id}',Productdetails::class)->name('productDetails'); 
 
 Route::post('/viewstatus', [Productpagelist::class, 'status']);
+
 Route::get('/distributor',Distributorpage::class)->name('distributor'); 
+
 Route::post('/distrinuterinsert',[Distributorpage::class,'distributerdata'])->name('distrinuterinsert');
+
+// role hairarchy details
+
+Route::get('/distributorhierarchy',Roledistributiion::class)->name('distributorhierarchy'); 
+
+Route::post('/distrinuterinserthierarchy',[Roledistributiion::class,'distributerdatainsert'])->name('distrinuterinserthierarchy');
+
+// role hairarchy details
+
 Route::get('/distributorlist',Distributerlist::class)->name('distributorlist'); 
+
 Route::get('/retailerpage',Retailerpage::class)->name('retailerpage'); 
 Route::post('/retailerinsert',[Retailerpage::class,'retailerdata'])->name('retailerinsert');
 Route::get('/retailerlist',Retailerlistpage::class)->name('retailerlist');
@@ -120,6 +143,14 @@ Route::get('/manageaccount',Manageaccount::class)->name('manageaccount');
 Route::post('/insertaccdata',[Manageaccount::class,'managedata'])->name('insertaccdata');
 Route::get('/manageaccountdata/{id}',Mangeaccountedit::class)->name('manageaccountdata'); 
 Route::post('/manageaccountedit/{id}',[Mangeaccountedit::class,'editaccountdata'])->name('manageaccountedit'); 
+
+
+// campany details 
+Route::get('/manageaccountlist/{id}',Managepermission::class)->name('manageaccountlist');
+Route::post('/insertaccdatalist',[Managepermission::class,'managedatalist'])->name('insertaccdatalist');
+Route::get('/manageaccountdatalist/{id}',Managepermission::class)->name('manageaccountdatalist'); 
+Route::post('/manageaccounteditlist/{id}',[Managepermission::class,'manageaccounteditlist'])->name('manageaccountedit'); 
+// campany details
 
 
 Route::get('/demo',Demoform::class)->name('demo');
@@ -180,6 +211,18 @@ Route::get('/discountdel/{id}',[Userdiscount::class,'deletediscountdata'])->name
 
 Route::get('/userdiscountdata/{id}',Userdiscountedit::class)->name('userdiscountdata');
 Route::post('/discountedit/{id}',[Userdiscountedit::class,'discountdataedit'])->name('discountedit');
+
+// brandadd add 
+
+Route::get('/userbrand',Brandadd::class)->name('userbrand');
+Route::post('/userbranddata',[Brandadd::class,'branddata'])->name('userbranddata');
+Route::get('/userbranddelete/{id}',[Brandadd::class,'deletediscountdata'])->name('userbranddelete');
+
+Route::get('/userbranddataedit/{id}',Brandadd::class)->name('userbranddataedit');
+Route::post('/branndedit/{id}',[Brandadd::class,'branddataedit'])->name('branndedit');
+
+//end brand add
+
 Route::get('/productinventery',Myproductinventery::class)->name('productinventery');
 
 Route::get('/userorder',Userorderrole::class)->name('userorder');
@@ -212,7 +255,17 @@ Route::post('/editmastercategorydata/{id}',[Editmastercategory::class,'editmaste
 Route::get('/editsubmaster/{id}',Editsubcategory::class)->name('editsubmaster');
 Route::post('/editsubcategorydata/{id}',[Editsubcategory::class,'editsubcategorydatas'])->name('editsubcategorydata');
 
+Route::get('/product-import', ProductCsvImport::class)->name('product-import');
 
+Route::get('/rolehierarchylist',Rolehierarchy::class)->name('rolehierarchylist'); 
 
-Route::get('/product-import', ProductCsvImport::class);
+Route::get('/permissionlist',Companypermission::class)->name('permissionlist'); 
+
+Route::get('/batchtracking/{id}',Trackingbystate::class)->name('batchtracking');
+
+Route::get('/BatchRole/{id}',BatchRoleTracking::class)->name('BatchRole');
+
+Route::get('/user-stock-details/{id}', Userstockdetails::class)->name('user.stock.details');
+Route::get('/Stockholder/{sellerid}', Stockholder::class)->name('stockholder');
+Route::get('/todaysell', Todaysell::class)->name('todaysell');
 }); 

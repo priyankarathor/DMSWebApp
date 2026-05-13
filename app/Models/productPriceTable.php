@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProductPriceTable extends Model
+class productPriceTable extends Model
 {
     protected $fillable = [
         'pid',
@@ -21,6 +21,6 @@ class ProductPriceTable extends Model
 
     public function product()
     {
-        return $this->belongsTo(Productadmintab::class, 'pid');
+        return $this->belongsTo(productadmintab::class, 'pid');
     }
 }

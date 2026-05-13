@@ -8,4 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class userhierarchytab extends Model
 {
     use HasFactory;
+
+    protected $fillable = [
+    'userId',
+   
+    'active',
+];
 }
