@@ -21,6 +21,8 @@ class Allhierarchydata extends Component
     {
         $children = [];
 
+        //all detils 
+
         foreach ($users as $user) {
             // direct hierarchy only
             // 1. first priority = assignid
