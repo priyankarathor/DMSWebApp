@@ -81,4 +81,57 @@ class ManageAccount extends Component
 
         return back()->with('success', 'Account and user deleted successfully.');
     }
+
+
+    public function getuseraccountdata()
+    {
+        $advertismentsec = manageaccounttable::get();
+
+        if ($advertismentsec->isNotEmpty()) {
+            return response()->json([
+                'account List' => $advertismentsec,
+                'Status' => 'Success'
+            ], 200);
+        } else {
+            return response()->json([
+                'Status' => 'Failed',
+                'Message' => 'No data found'
+            ], 200);
+        }
+    }
+
+
+    public function userlogindata()
+    {
+        $advertismentsec = User::get();
+
+        if ($advertismentsec->isNotEmpty()) {
+            return response()->json([
+                'Login List' => $advertismentsec,
+                'Status' => 'Success'
+            ], 200);
+        } else {
+            return response()->json([
+                'Status' => 'Failed',
+                'Message' => 'No data found'
+            ], 200);
+        }
+    }
+
+    public function userroledata()
+    {
+        $role = userroletab::get();
+
+        if ($role->isNotEmpty()) {
+            return response()->json([
+                'role' => $role,
+                'Status' => 'Success'
+            ], 200);
+        } else {
+            return response()->json([
+                'Status' => 'Failed',
+                'Message' => 'No data found'
+            ], 200);
+        }
+    }
 }

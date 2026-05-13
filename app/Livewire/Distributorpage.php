@@ -11,24 +11,24 @@ use Illuminate\Support\Facades\Auth;
 
 class Distributorpage extends Component
 {
-   public $user;
-public $userId;
-public $role;
-public $userrole;
+    public $user;
+    public $userId;
+    public $role;
+    public $userrole;
 
-public function mount()
-{
-    $this->user = Auth::user();
+    public function mount()
+    {
+        $this->user = Auth::user();
 
-    $this->userId = $this->user ? $this->user->id : null;
-    $this->role = $this->user ? $this->user->role : null;
+        $this->userId = $this->user ? $this->user->id : null;
+        $this->role = $this->user ? $this->user->role : null;
 
-    // ✅ FIX HERE
-    $this->userrole = $this->user ? $this->user->userrole : null;
+        // ✅ FIX HERE
+        $this->userrole = $this->user ? $this->user->userrole : null;
 
-    // dd($this->userId);
-}
- 
+        // dd($this->userId);
+    }
+
 
     public function render()
     {
@@ -85,7 +85,7 @@ public function mount()
 
         if ($lastUser && !empty($lastUser->registerid)) {
             $parts = explode('-', $lastUser->registerid);
-            $lastNumber = isset($parts[1]) ? (int)$parts[1] : 0;
+            $lastNumber = isset($parts[1]) ? (int) $parts[1] : 0;
             $nextNumber = $lastNumber + 1;
         } else {
             $nextNumber = 1;
@@ -139,7 +139,7 @@ public function mount()
 
         if ($lastUser && !empty($lastUser->registerid)) {
             $parts = explode('-', $lastUser->registerid);
-            $lastNumber = isset($parts[1]) ? (int)$parts[1] : 0;
+            $lastNumber = isset($parts[1]) ? (int) $parts[1] : 0;
             $nextNumber = $lastNumber + 1;
         } else {
             $nextNumber = 1;
@@ -202,6 +202,114 @@ public function mount()
             return response()->json([
                 'Status' => 'Failed'
             ], 200);
+        }
+    }
+
+    /**
+     * GET /api/get_hierarchy/{id}
+     * Returns full nested tree from a given user ID
+     */
+    public function getHierarchy($id)
+    {
+        $user = UserHierarchyTab::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found',
+            ], 404);
+        }
+
+        $tree = $this->buildTree($user);
+
+        return response()->json([
+            'status' => true,
+            'data' => $tree,
+        ]);
+    }
+
+    /**
+     * GET /api/get_all_descendants/{id}
+     * Returns a flat list of ALL descendants (all levels deep)
+     */
+    public function getAllDescendants($id)
+    {
+        // ✅ Find the user by ID only (no active filter on parent)
+        $user = UserHierarchyTab::find($id);
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'User not found',
+            ], 404);
+        }
+
+        $descendants = [];
+        $this->collectDescendants($id, $descendants);
+
+        return response()->json([
+            'status' => true,
+            'total' => count($descendants),
+            'data' => $descendants,
+        ]);
+    }
+
+    // -------------------------------------------------------
+    // PRIVATE HELPERS
+    // -------------------------------------------------------
+
+    /**
+     * Recursively build a nested tree for a given user node
+     */
+    private function buildTree(UserHierarchyTab $user): array
+    {
+        $children = UserHierarchyTab::where('zonalId', $user->id)
+            ->where('active', '!=', 'deactivate') // ✅ Skip deactivated
+            ->get();
+
+        $childNodes = [];
+        foreach ($children as $child) {
+            $childNodes[] = $this->buildTree($child);
+        }
+
+        return [
+            'id' => $user->id,
+            'username' => $user->username,
+            'role' => $user->framname,
+            'roleid' => $user->roleid,
+            'rgid' => $user->rgid,
+            'email' => $user->email,
+            'contact' => $user->contactno,
+            'city' => $user->city,
+            'state' => $user->state,
+            'active' => $user->active,
+            'children' => $childNodes,
+        ];
+    }
+
+    /**
+     * Recursively collect all descendants into a flat array
+     */
+    private function collectDescendants(int $parentId, array &$result): void
+    {
+        $children = UserHierarchyTab::where('zonalId', $parentId)
+            ->where('active', '!=', 'deactivate') // ✅ Skip deactivated users
+            ->get();
+
+        foreach ($children as $child) {
+            $result[] = [
+                'id' => $child->id,
+                'username' => $child->username,
+                'role' => $child->framname,
+                'roleid' => $child->roleid,
+                'zonalId' => $child->zonalId,
+                'email' => $child->email,
+                'contact' => $child->contactno,
+                'city' => $child->city,
+                'state' => $child->state,
+                'active' => $child->active,
+            ];
+            $this->collectDescendants($child->id, $result);
         }
     }
 }

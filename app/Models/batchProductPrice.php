@@ -20,4 +20,9 @@ class batchProductPrice extends Model
     {
         return $this->belongsTo(productadmintab::class, 'pid');
     }
+
+    public function priceTable()
+    {
+        return $this->belongsTo(productPriceTable::class, 'priceid', 'id');
+    }
 }

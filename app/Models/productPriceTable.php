@@ -23,4 +23,9 @@ class productPriceTable extends Model
     {
         return $this->belongsTo(productadmintab::class, 'pid');
     }
+
+    public function batches()
+    {
+        return $this->hasMany(BatchProductPrice::class, 'priceid', 'id');
+    }
 }
