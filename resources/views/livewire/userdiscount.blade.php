@@ -1,128 +1,268 @@
 <div>
     <style>
-        .switch {
-          position: relative;
-          display: inline-block;
-          width: 50px;
-          margin-left: 0px;
-          height: 27px;
+        .discount-wrapper {
+            padding: 20px;
         }
-        
-        .switch input { 
-          opacity: 0;
-          width: 0;
-          height: 0;
+
+        .discount-card {
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            background: #fff;
         }
-        
-        .slider {
-          position: absolute;
-          cursor: pointer;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: #ccc;
-          -webkit-transition: .4s;
-          transition: .4s;
+
+        .discount-card-header {
+            background: linear-gradient(135deg, #0F172A, #0F172A);
+            color: #fff;
+            padding: 16px 22px;
         }
-        
-        .slider:before {
-          position: absolute;
-          content: "";
-          height: 18px;
-          width: 18px;
-          left: 4px;
-          bottom: 4px;
-          background-color: white;
-          -webkit-transition: .4s;
-          transition: .4s;
+
+        .discount-card-header h4 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
         }
-        
-        input:checked + .slider {
-          background-color: #115e0f;
+
+        .discount-card-body {
+            padding: 24px;
         }
-        
-        input:focus + .slider {
-          box-shadow: 0 0 1px #115e0f;
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 7px;
         }
-        
-        input:checked + .slider:before {
-          -webkit-transform: translateX(26px);
-          -ms-transform: translateX(26px);
-          transform: translateX(26px);
+
+        .form-control,
+        .form-select {
+            border-radius: 8px;
+            padding: 10px 12px;
+            border: 1px solid #d9d9d9;
         }
-        
-        /* Rounded sliders */
-        .slider.round {
-          border-radius: 34px;
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #0F172A;
+            box-shadow: 0 0 0 0.15rem rgba(25, 135, 84, 0.15);
         }
-        
-        .slider.round:before {
-          border-radius: 50%;
+
+        .btn-main {
+            background: #0F172A;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px 22px;
+            border: none;
+            font-weight: 600;
         }
-    
-          .modal-body {
+
+        .btn-main:hover {
+            background: #0F172A;
+            color: #fff;
+        }
+
+        .table-card {
+            margin-top: 28px;
+            border: none;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .table-card-header {
+            padding: 16px 22px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-card-header h5 {
+            margin: 0;
+            color: #198754;
+            font-weight: 700;
+        }
+
+        .custom-table {
+            margin-bottom: 0;
+            vertical-align: middle;
+        }
+
+        .custom-table thead {
+            background: #0F172A;
+            color: #fff;
+        }
+
+        .custom-table thead th {
+            font-size: 14px;
+            white-space: nowrap;
+            padding: 13px; 
+        }
+
+        .custom-table tbody td {
+            padding: 12px;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .badge-role {
+            background: #d1e7dd;
+            color: #0F172A;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .badge-user {
+            background: #fff3cd;
+            color: #664d03;
+            padding: 6px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .discount-rate {
+            font-weight: 700;
+            color: #198754;
+        }
+
+        .btn-edit {
+            border: 1px solid #198754;
+            color: #198754;
+            background: #fff;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .btn-edit:hover {
+            background: #0F172A;
+            color: #fff;
+        }
+
+        .btn-delete {
+            border: 1px solid #dc3545;
+            color: #dc3545;
+            background: #fff;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .btn-delete:hover {
+            background: #dc3545;
+            color: #fff;
+        }
+
+        .empty-box {
+            padding: 30px;
+            text-align: center;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .alert {
+            border-radius: 10px;
+        }
+
+        .pagination-wrapper {
+            padding: 16px 20px;
+            border-top: 1px solid #e9ecef;
+            background: #fff;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .pagination {
+            margin-bottom: 0;
+        }
+
+        .page-link {
+            color: #0F172A;
+        }
+
+        .page-item.active .page-link {
+            background-color: #0F172A;
+            border-color: #0F172A;
+            color: #fff;
+        }
+
+        .edit-modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            max-width: 100%;
-            overflow: hidden;
-          }
-        
-          .modal-body p {
-            word-wrap: break-word;
-            word-break: break-all;
-            overflow: hidden;
-          }
-        
-        .modal-body {
-        max-height: 70vh; 
-        overflow-y: auto; 
+            height: 100%;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-    
-        .section p {
-            word-wrap: break-word; 
-            white-space: normal; 
+
+        .edit-modal-card {
+            width: 100%;
+            max-width: 850px;
+            background: #fff;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 8px 35px rgba(0, 0, 0, 0.25);
         }
-        .dropbtn {
-              background-color: #fff;
-              color: #000;
-              padding: 16px;
-              font-size: 16px;
-              border: none;
-              cursor: pointer;
-            }
-            .dropdown-content {
-              display: none;
-              position: absolute;
-              background-color: #f9f9f9;
-              min-width: 100px;
-              box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-              z-index: 1;
-              right: 0; /* Align the dropdown content to the right */
-            }
-            
-            .dropdown-content a {
-              color: black;
-              padding: 12px 16px;
-              text-decoration: none;
-              display: block;
-            }
-            
-            .dropdown-content a:hover {
-              background-color: #f1f1f1;
-            }
-            
-            .dropdown:hover .dropdown-content {
-              display: block;
-            }
-            
-            .dropdown:hover .dropbtn {
-              background-color: #23650a;
-            }
-        </style>
 
+        .edit-modal-header {
+            background: linear-gradient(135deg, #0F172A, #0F172A);
+            color: white;
+            padding: 16px 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-<div>
-    <div class="container mt-3">
+        .edit-modal-header h5 {
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .edit-close {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 28px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .edit-modal-body {
+            padding: 24px;
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .edit-modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .table-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .pagination-wrapper {
+                justify-content: center;
+            }
+        }
+    </style>
+
+    <div class="discount-wrapper">
 
         @if (session()->has('success'))
             <div class="alert alert-success">
@@ -130,51 +270,62 @@
             </div>
         @endif
 
-        <div class="card">
-            <div class="card-header">
-                <h4 style="color:green; font-size:20px;">Add Discount</h4>
+        {{-- Add Discount Form --}}
+        <div class="discount-card">
+            <div class="discount-card-header">
+                <h4 style="color: #d1e7dd;">Add Discount</h4>
             </div>
 
-            <div class="card-body">
+            <div class="discount-card-body">
                 <form wire:submit.prevent="discount">
                     <div class="row">
 
                         <div class="mb-3 col-md-6">
-                            <label class="mb-2">Discount Apply On</label>
-                            <select class="form-control" wire:model.live="discount_type">
+                            <label class="form-label">Discount Apply On</label>
+                            <select class="form-select" wire:model.live="discount_type">
                                 <option value="role">Whole Role</option>
                                 <option value="user">Only One User</option>
                             </select>
+                            @error('discount_type')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
 
                         <div class="mb-3 col-md-6">
-                            <label class="mb-2">Role</label>
-                            <select class="form-control" wire:model.live="role_id">
+                            <label class="form-label">Role</label>
+                            <select class="form-select" wire:model.live="role_id">
                                 <option value="">--------- Select Role ---------</option>
                                 @foreach ($tab as $item)
-                                    <option value="{{ $item->id }}">{{ $item->role }}</option>
+                                    <option value="{{ $item->id }}">
+                                        {{ $item->role }}
+                                    </option>
                                 @endforeach
                             </select>
-                            @error('role_id') <small class="text-danger">{{ $message }}</small> @enderror
+                            @error('role_id')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
 
                         @if ($discount_type === 'user')
                             <div class="mb-3 col-md-6">
-                                <label class="mb-2">State</label>
-                                <select class="form-control" wire:model.live="state">
+                                <label class="form-label">State</label>
+                                <select class="form-select" wire:model.live="state">
                                     <option value="">--------- Select State ---------</option>
                                     @foreach ($states as $item)
-                                        <option value="{{ $item->state }}">{{ $item->state }}</option>
+                                        <option value="{{ $item->state }}">
+                                            {{ $item->state }}
+                                        </option>
                                     @endforeach
                                 </select>
-                                @error('state') <small class="text-danger">{{ $message }}</small> @enderror
+                                @error('state')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
 
                             <div class="mb-3 col-md-6">
-                                <label class="mb-2">User</label>
-                                <select class="form-control" wire:model="user_id">
+                                <label class="form-label">User</label>
+                                <select class="form-select" wire:model="user_id">
                                     <option value="">--------- Select User ---------</option>
-
                                     @foreach ($users as $user)
                                         <option value="{{ $user->id }}">
                                             {{ $user->username }}
@@ -185,19 +336,31 @@
                                         </option>
                                     @endforeach
                                 </select>
-                                @error('user_id') <small class="text-danger">{{ $message }}</small> @enderror
+                                @error('user_id')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                         @endif
 
                         <div class="mb-3 col-md-6">
-                            <label class="mb-2">Discount Rate (%)</label>
-                            <input class="form-control" type="number" step="0.01" wire:model="rate">
-                            @error('rate') <small class="text-danger">{{ $message }}</small> @enderror
+                            <label class="form-label">Discount Rate (%)</label>
+                            <input 
+                                class="form-control" 
+                                type="number" 
+                                step="0.01" 
+                                min="0"
+                                max="100"
+                                wire:model="rate"
+                                placeholder="Enter discount rate"
+                            >
+                            @error('rate')
+                                <small class="text-danger">{{ $message }}</small>
+                            @enderror
                         </div>
 
-                        <div class="col-md-2 mt-4">
-                            <button type="submit" class="btn btn-outline-success">
-                                Submit
+                        <div class="col-md-12 mt-3">
+                            <button type="submit" class="btn-main">
+                                Submit Discount
                             </button>
                         </div>
 
@@ -205,19 +368,17 @@
                 </form>
             </div>
         </div>
-    </div>
 
-
-    <div class="container mt-4">
-        <div class="card">
-            <div class="card-header">
-                <span class="card-title">Discount List</span>
+        {{-- Discount List --}}
+        <div class="table-card">
+            <div class="table-card-header">
+                <h5>Discount List</h5>
+                <span>Total: {{ $disocunt->total() }}</span>
             </div>
 
-            <div class="card-body">
+            <div class="card-body p-0">
                 <div class="table-responsive">
-
-                    <table class="table table-bordered table-striped">
+                    <table class="table custom-table table-bordered">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -235,13 +396,13 @@
                         <tbody>
                             @forelse ($disocunt as $index => $item)
                                 <tr>
-                                    <td>{{ $index + 1 }}</td>
+                                    <td>{{ $disocunt->firstItem() + $index }}</td>
 
                                     <td>
-                                        @if ($item->discount_type === 'role')
-                                            Whole Role
+                                        @if ($item->discount === 'role')
+                                            <span class="badge-role">Whole Role</span>
                                         @else
-                                            Single User
+                                            <span class="badge-user">Single User</span>
                                         @endif
                                     </td>
 
@@ -257,92 +418,173 @@
                                     <td>{{ $item->username ?? '-' }}</td>
                                     <td>{{ $item->registerid ?? '-' }}</td>
                                     <td>{{ $item->email ?? '-' }}</td>
-                                    <td>{{ $item->rate }}%</td>
+
+                                    <td>
+                                        <span class="discount-rate">
+                                            {{ $item->rate }}%
+                                        </span>
+                                    </td>
 
                                     <td>
                                         <button 
+                                            type="button"
+                                            wire:click="editDiscount({{ $item->id }})"
+                                            class="btn-edit">
+                                            Edit
+                                        </button>
+
+                                        <button 
+                                            type="button"
                                             wire:click="deletediscountdata({{ $item->id }})"
-                                            onclick="return confirm('Are you sure?')"
-                                            class="btn btn-outline-danger btn-sm">
+                                            onclick="return confirm('Are you sure you want to delete this discount?')"
+                                            class="btn-delete ms-1">
                                             Delete
                                         </button>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="9" class="text-center">
-                                        No discount data found.
+                                    <td colspan="9">
+                                        <div class="empty-box">
+                                            No discount data found.
+                                        </div>
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
 
                     </table>
-
                 </div>
+
+                @if ($disocunt->hasPages())
+                    <div class="pagination-wrapper">
+                        {{ $disocunt->links() }}
+                    </div>
+                @endif
             </div>
         </div>
+
     </div>
-</div>
 
+    {{-- Edit Popup Card --}}
+    @if ($isEdit)
+        <div class="edit-modal-backdrop" wire:key="edit-discount-modal">
+            <div class="edit-modal-card">
 
-    <div class="container mt-3">
-        <div class="row">
-        <div class="card">
-            <div class="card-header">
-                <div class="row mt-2">
-                    <div class="col-md-8">
-                    <span class="card-title">User Role</span> &nbsp;&nbsp;          
+                <div class="edit-modal-header">
+                    <h5>Edit Discount</h5>
+
+                    <button 
+                        type="button"
+                        class="edit-close"
+                        wire:click="cancelEdit">
+                        &times;
+                    </button>
                 </div>
-    
-                    <div class="col-md-4">
-                      <div class="row justify-content-end">
-                            <div class=" d-flex align-items-center">
-                                <span for="search" class="form-label me-2">Search:</span>
-                                <input type="text" class="form-control" name="search" id="search" placeholder="Search table data...">
+
+                <form wire:submit.prevent="discount">
+                    <div class="edit-modal-body">
+                        <div class="row">
+
+                            <div class="mb-3 col-md-6">
+                                <label class="form-label">Discount Apply On</label>
+                                <select class="form-select" wire:model.live="discount_type">
+                                    <option value="role">Whole Role</option>
+                                    <option value="user">Only One User</option>
+                                </select>
+                                @error('discount_type')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            <div class="mb-3 col-md-6">
+                                <label class="form-label">Role</label>
+                                <select class="form-select" wire:model.live="role_id">
+                                    <option value="">--------- Select Role ---------</option>
+                                    @foreach ($tab as $item)
+                                        <option value="{{ $item->id }}">
+                                            {{ $item->role }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('role_id')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                            @if ($discount_type === 'user')
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">State</label>
+                                    <select class="form-select" wire:model.live="state">
+                                        <option value="">--------- Select State ---------</option>
+                                        @foreach ($states as $item)
+                                            <option value="{{ $item->state }}">
+                                                {{ $item->state }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('state')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3 col-md-6">
+                                    <label class="form-label">User</label>
+                                    <select class="form-select" wire:model="user_id">
+                                        <option value="">--------- Select User ---------</option>
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}">
+                                                {{ $user->username }}
+                                                -
+                                                {{ $user->registerid }}
+                                                -
+                                                {{ $user->email }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('user_id')
+                                        <small class="text-danger">{{ $message }}</small>
+                                    @enderror
+                                </div>
+                            @endif
+
+                            <div class="mb-3 col-md-6">
+                                <label class="form-label">Discount Rate (%)</label>
+                                <input 
+                                    class="form-control" 
+                                    type="number" 
+                                    step="0.01" 
+                                    min="0"
+                                    max="100"
+                                    wire:model="rate"
+                                    placeholder="Enter discount rate"
+                                >
+                                @error('rate')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
+                            </div>
+
                         </div>
                     </div>
+
+                    <div class="edit-modal-footer">
+                        <button 
+                            type="button"
+                            class="btn btn-secondary"
+                            wire:click="cancelEdit">
+                            Cancel
+                        </button>
+
+                        <button 
+                            type="submit"
+                            class="btn btn-success">
+                            Update Discount
+                        </button>
                     </div>
-                </div>
+                </form>
+
             </div>
-            
-            <div class="card-body">
-            <div class="table-responsive">
-              <table class="table mb-0"  id="myTable">
-        <thead class="thead-light ">
-        <tr>
-        <th>#</th>
-        <th>Role</th>
-        <th>Commission Rate</th>  
-        <th>Action</th>
-        </tr>
-        </thead>
-        <tbody class="" style="width: 100%;">
-            @foreach ($disocunt as $item)
-            <tr>
-                <th scope="row">{{$item->id}}</th>
-                @foreach ($tab as $roledata)
-                @if($roledata->id == $item->role)
-                <td>{{$roledata->role}}</td>
-                @endif
-                @endforeach
-                <td>{{$item->rate}} %</td>
-               <td>
-                <a href="{{url('/userdiscountdata/'.$item->id)}}"><button class="btn btn-outline-success">Edit</button>&nbsp;&nbsp;&nbsp;</a>
-                <a href="{{url('/discountdel/'.$item->id)}}"><button class="btn btn-outline-danger">Delete</button></a>
-               </td>
-            </tr>
-            @endforeach
-        </tbody>
-        </table>
         </div>
-        <div class="pagination-container mt-3">
-            <button onclick="prevPage()" id="btn_prev"  class="btn btn-outline-success">Prev</button>
-            &nbsp;&nbsp;&nbsp;<span id="page-info"></span>&nbsp;&nbsp;&nbsp;
-            <button onclick="nextPage()" id="btn_next"  class="btn btn-outline-success">Next</button>
-        </div>
-        </div>
-        </div>
-        </div>
-</div>
+    @endif
+
 </div>

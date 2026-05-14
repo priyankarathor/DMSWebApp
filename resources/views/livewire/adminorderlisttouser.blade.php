@@ -24,6 +24,7 @@
                             <th>User Register Id</th>
                             <th>User Name</th>
                             <th>User Email</th>
+                            <th>State</th>
                             <th>User Role</th>
                             <th>User Contact</th>
                             <th>Product status</th>
@@ -39,6 +40,8 @@
                             <th scope="row">{{$item->registerid}}</th>
                             <td>{{$item->username}}</td>
                             <td>{{$item->email}}</td>
+                 
+                            <td>{{$item->region}}</td>
                             @foreach ($userrole as $tabrole)
                             @if($tabrole->id == $item->roleid)
                             <td>{{$tabrole->role}}</td>
