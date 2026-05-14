@@ -89,9 +89,9 @@ class ProductCsvImport extends Component
                 $metaTag = $data['meta tag'] ?? '';
                 $metaKeyword = $data['meta keyword'] ?? '';
                 $metaDescription = $data['meta description'] ?? '';
-                $action = $data['action'] ?? '';
+                $action = $data['action'] ?? 'Active';
 
-                $batchNo = $data['batch no'] ?? '';
+                $batchNo = trim($data['batch no'] ?? '');
 
                 $boxqty = (int) ($data['box qty'] ?? $data['qty'] ?? 0);
                 $pcsqty = (int) ($data['pcs qty'] ?? $data['max qty'] ?? 0);
@@ -99,12 +99,13 @@ class ProductCsvImport extends Component
                 $totalqty = $boxqty * $pcsqty;
                 $inventoryqty = $totalqty;
 
-                $state = $data['state'] ?? '';
-                $priceCndf = $data['price cndf'] ?? '';
-                $priceDistributor = $data['price distributor'] ?? '';
-                $priceDealer = $data['price dealer'] ?? '';
-                $priceSubDealer = $data['price sub dealer'] ?? '';
-                $priceRetailer = $data['price retailer'] ?? '';
+                $state = trim($data['state'] ?? '');
+
+                $priceCndf = $this->cleanPrice($data['price cndf'] ?? 0);
+                $priceDistributor = $this->cleanPrice($data['price distributor'] ?? 0);
+                $priceDealer = $this->cleanPrice($data['price dealer'] ?? 0);
+                $priceSubDealer = $this->cleanPrice($data['price sub dealer'] ?? 0);
+                $priceRetailer = $this->cleanPrice($data['price retailer'] ?? 0);
 
                 if (empty($productName) && empty($hsnCode)) {
                     continue;
@@ -138,34 +139,13 @@ class ProductCsvImport extends Component
                     ]
                 );
 
-                $priceId = null;
-
-                if (!empty($state)) {
-                    $priceRow = ProductPriceTable::firstOrNew([
-                        'pid' => $product->id,
-                        'state' => $state,
-                    ]);
-
-                    $priceRow->pricecndf = $priceCndf;
-                    $priceRow->pricedistributor = $priceDistributor;
-                    $priceRow->pricedealer = $priceDealer;
-                    $priceRow->pricesubdealer = $priceSubDealer;
-                    $priceRow->priceretialer = $priceRetailer;
-
-                    if (!empty($batchNo)) {
-                        $priceRow->batchnos = $this->mergeBatchNos($priceRow->batchnos, $batchNo);
-                    }
-
-                    $priceRow->save();
-                    $priceId = $priceRow->id;
-                }
+                $batch = null;
 
                 if (!empty($batchNo)) {
-                    BatchProductPrice::updateOrCreate(
+                    $batch = BatchProductPrice::updateOrCreate(
                         [
                             'pid' => $product->id,
                             'batchno' => $batchNo,
-                            'priceid' => $priceId,
                         ],
                         [
                             'boxqty' => $boxqty,
@@ -175,12 +155,32 @@ class ProductCsvImport extends Component
                         ]
                     );
                 }
+
+                if (!empty($state) && $batch) {
+                    $priceRow = ProductPriceTable::updateOrCreate(
+                        [
+                            'pid' => $product->id,
+                            'state' => $state,
+                            'batchnos' => $batch->id,
+                        ],
+                        [
+                            'pricecndf' => $priceCndf,
+                            'pricedistributor' => $priceDistributor,
+                            'pricedealer' => $priceDealer,
+                            'pricesubdealer' => $priceSubDealer,
+                            'priceretialer' => $priceRetailer,
+                        ]
+                    );
+
+                    $batch->priceid = $priceRow->id;
+                    $batch->save();
+                }
             }
 
             fclose($file);
             DB::commit();
 
-            session()->flash('success', 'CSV imported successfully.');
+            session()->flash('success', 'CSV imported successfully with batch id in price table.');
             $this->reset('csv');
 
         } catch (\Exception $e) {
@@ -259,37 +259,15 @@ class ProductCsvImport extends Component
     {
         $value = trim((string) $value);
         $value = mb_convert_encoding($value, 'UTF-8', 'UTF-8, ISO-8859-1, Windows-1252');
+
         return str_replace(["\xC2\xA0", "\r", "\n"], [' ', ' ', ' '], $value);
     }
 
-    private function mergeBatchNos($existingBatchnos, $newBatchNo)
+    private function cleanPrice($value)
     {
-        $existingBatchnos = trim((string) $existingBatchnos);
-        $newBatchNo = trim((string) $newBatchNo);
+        $value = str_replace([',', '₹', 'Rs.', 'rs.', ' '], '', (string) $value);
 
-        if ($newBatchNo === '') {
-            return $existingBatchnos;
-        }
-
-        $batchList = [];
-
-        if ($existingBatchnos !== '') {
-            foreach (explode(',', $existingBatchnos) as $part) {
-                $clean = trim($part);
-                $clean = trim($clean, "'");
-                $clean = trim($clean, '"');
-
-                if ($clean !== '') {
-                    $batchList[] = $clean;
-                }
-            }
-        }
-
-        if (!in_array($newBatchNo, $batchList)) {
-            $batchList[] = $newBatchNo;
-        }
-
-        return "'" . implode("','", array_unique($batchList)) . "'";
+        return is_numeric($value) ? $value : 0;
     }
 
     public function render()
