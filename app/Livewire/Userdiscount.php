@@ -3,14 +3,18 @@
 namespace App\Livewire;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use App\Models\rolediscount;
 use App\Models\userroletab;
 use App\Models\userhierarchytab;
 
 class Userdiscount extends Component
 {
-    public $discount_type = 'role'; // role or user
+    use WithPagination;
 
+    protected $paginationTheme = 'bootstrap';
+
+    public $discount_type = 'role';
     public $role_id;
     public $state;
     public $user_id;
@@ -18,69 +22,147 @@ class Userdiscount extends Component
 
     public $users = [];
 
+    public $edit_id = null;
+    public $isEdit = false;
+
+    public function updatedDiscountType()
+    {
+        $this->resetPage();
+        $this->reset(['role_id', 'state', 'user_id', 'rate', 'users']);
+    }
+
     public function updatedRoleId()
     {
-        $this->loadUsers();
+        $this->resetPage();
+        $this->state = null;
+        $this->user_id = null;
+        $this->users = [];
     }
 
     public function updatedState()
     {
+        $this->resetPage();
+        $this->user_id = null;
         $this->loadUsers();
-    }
-
-    public function updatedDiscountType()
-    {
-        $this->reset(['role_id', 'state', 'user_id', 'rate', 'users']);
     }
 
     public function loadUsers()
     {
-        if ($this->discount_type === 'user' && $this->role_id && $this->state) {
+        $this->users = [];
+
+        if ($this->discount_type === 'user' && !empty($this->role_id) && !empty($this->state)) {
             $this->users = userhierarchytab::where('roleid', $this->role_id)
-                ->where('state', $this->state)
+                ->whereRaw('TRIM(state) = ?', [trim($this->state)])
+                ->orderBy('username')
                 ->get();
-        } else {
-            $this->users = [];
         }
     }
 
     public function discount()
     {
-        $this->validate([
-            'discount_type' => 'required',
+        $rules = [
+            'discount_type' => 'required|in:role,user',
             'role_id' => 'required',
-            'rate' => 'required|numeric',
-        ]);
+            'rate' => 'required|numeric|min:0|max:100',
+        ];
 
         if ($this->discount_type === 'user') {
-            $this->validate([
-                'state' => 'required',
-                'user_id' => 'required',
-            ]);
+            $rules['state'] = 'required';
+            $rules['user_id'] = 'required';
         }
+
+        $this->validate($rules);
 
         $user = null;
 
         if ($this->discount_type === 'user') {
             $user = userhierarchytab::where('id', $this->user_id)
                 ->where('roleid', $this->role_id)
-                ->where('state', $this->state)
+                ->whereRaw('TRIM(state) = ?', [trim($this->state)])
                 ->first();
+
+            if (!$user) {
+                $this->addError('user_id', 'Selected user not found for this role and state.');
+                return;
+            }
         }
 
-        rolediscount::create([
-            'discount' => $this->discount_type,
-            'role' => $this->role_id,
-            'state' => $this->discount_type === 'user' ? $this->state : null,
-            'username' => $user->username ?? null,
-            'registerid' => $user->id ?? null,
-            'email' => $user->email ?? null,
-            'rate' => $this->rate,
+        if ($this->isEdit && $this->edit_id) {
+            $discount = rolediscount::findOrFail($this->edit_id);
+        } else {
+            $discount = new rolediscount();
+        }
+
+        $discount->discount = $this->discount_type;
+        $discount->role = $this->role_id;
+        $discount->state = $this->discount_type === 'user' ? trim($this->state) : null;
+
+        if ($this->discount_type === 'user') {
+            $discount->username = $user->username ?? null;
+
+            // IMPORTANT:
+            // registerid column me selected user ka table id save hoga
+            $discount->registerid = $user->id ?? null;
+
+            $discount->email = $user->email ?? null;
+        } else {
+            $discount->username = null;
+            $discount->registerid = null;
+            $discount->email = null;
+        }
+
+        $discount->rate = $this->rate;
+        $discount->save();
+
+        session()->flash(
+            'success',
+            $this->isEdit ? 'Discount updated successfully.' : 'Discount added successfully.'
+        );
+
+        $this->resetForm();
+    }
+
+    public function editDiscount($id)
+    {
+        $data = rolediscount::findOrFail($id);
+
+        $this->edit_id = $data->id;
+        $this->isEdit = true;
+
+        $this->discount_type = $data->discount ?? 'role';
+        $this->role_id = $data->role;
+        $this->state = $data->state;
+        $this->rate = $data->rate;
+
+        $this->loadUsers();
+
+        if ($this->discount_type === 'user') {
+            // registerid column me userhierarchytab ka id saved hai
+            // isliye edit time wahi selected user dropdown me selected hoga
+            $this->user_id = userhierarchytab::where('id', $data->registerid)
+                ->where('roleid', $data->role)
+                ->whereRaw('TRIM(state) = ?', [trim($data->state)])
+                ->value('id');
+        }
+    }
+
+    public function cancelEdit()
+    {
+        $this->resetForm();
+    }
+
+    public function resetForm()
+    {
+        $this->reset([
+            'role_id',
+            'state',
+            'user_id',
+            'rate',
+            'users',
+            'edit_id',
+            'isEdit',
         ]);
 
-        session()->flash('success', 'Discount added successfully.');
-
-        $this->reset(['role_id', 'state', 'user_id', 'rate', 'users']);
         $this->discount_type = 'role';
     }
 
@@ -92,23 +174,25 @@ class Userdiscount extends Component
             $data->delete();
             session()->flash('success', 'Discount deleted successfully.');
         }
+
+        if ($this->edit_id == $id) {
+            $this->resetForm();
+        }
     }
 
     public function render()
     {
-        $roles = userroletab::get();
-
-        $states = userhierarchytab::select('state')
-            ->whereNotNull('state')
-            ->distinct()
-            ->get();
-
-        $discountdata = rolediscount::latest()->get();
-
         return view('livewire.userdiscount', [
-            'tab' => $roles,
-            'states' => $states,
-            'disocunt' => $discountdata,
+            'tab' => userroletab::orderBy('role')->get(),
+
+            'states' => userhierarchytab::select('state')
+                ->whereNotNull('state')
+                ->where('state', '!=', '')
+                ->distinct()
+                ->orderBy('state')
+                ->get(),
+
+            'disocunt' => rolediscount::latest()->paginate(10),
         ])->layout('layouts.header');
     }
 }

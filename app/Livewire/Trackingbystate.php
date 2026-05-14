@@ -14,41 +14,14 @@ class Trackingbystate extends Component
     public $search = '';
     public $batchFilter = '';
     public $stateFilter = '';
-
+    public $perPage = 10;
     public $productId;
-    public $rows = [];
 
     protected $paginationTheme = 'bootstrap';
 
     public function mount($id)
     {
         $this->productId = $id;
-
-        $batches = BatchProductPrice::where('pid', $id)->get();
-
-        $this->rows = $batches->map(function ($batch) {
-
-            $price = ProductPriceTable::where('id', $batch->priceid)->first();
-
-            return [
-                'id' => $batch->id,
-                'batch_no' => $batch->batchno,
-                'state' => $batch->state ?? ($price->state ?? 'N/A'),
-
-                'box_qty' => (int) ($batch->boxqty ?? 0),
-                'pcs_qty' => (int) ($batch->pcsqty ?? 0),
-                'total_pcs' => (int) ($batch->totalqty ?? 0),
-                'inventoryqty' => (int) ($batch->inventoryqty ?? 0),
-
-                'priceid' => $batch->priceid,
-
-                'pricecndf' => $price->pricecndf ?? 0,
-                'pricedistributor' => $price->pricedistributor ?? 0,
-                'pricedealer' => $price->pricedealer ?? 0,
-                'pricesubdealer' => $price->pricesubdealer ?? 0,
-                'priceretialer' => $price->priceretialer ?? 0,
-            ];
-        })->toArray();
     }
 
     public function updatingSearch()
@@ -66,59 +39,98 @@ class Trackingbystate extends Component
         $this->resetPage();
     }
 
-    public function getFilteredRowsProperty()
+    public function updatingPerPage()
     {
-        $data = collect($this->rows);
+        $this->resetPage();
+    }
 
-        if ($this->search) {
-            $search = strtolower($this->search);
+    public function resetFilters()
+    {
+        $this->search = '';
+        $this->batchFilter = '';
+        $this->stateFilter = '';
+        $this->perPage = 10;
+        $this->resetPage();
+    }
 
-            $data = $data->filter(function ($row) use ($search) {
-                return str_contains(strtolower($row['batch_no']), $search)
-                    || str_contains(strtolower($row['state']), $search);
+    private function baseQuery()
+    {
+        $batchTable = (new BatchProductPrice)->getTable();
+        $priceTable = (new ProductPriceTable)->getTable();
+
+        return BatchProductPrice::query()
+            ->leftJoin($priceTable, "$batchTable.priceid", '=', "$priceTable.id")
+            ->where("$batchTable.pid", $this->productId)
+            ->select(
+                "$batchTable.id",
+                "$batchTable.batchno",
+                "$batchTable.boxqty",
+                "$batchTable.pcsqty",
+                "$batchTable.totalqty",
+                "$batchTable.inventoryqty",
+                "$batchTable.priceid",
+                "$priceTable.state as state",
+                "$priceTable.pricecndf",
+                "$priceTable.pricedistributor",
+                "$priceTable.pricedealer",
+                "$priceTable.pricesubdealer",
+                "$priceTable.priceretialer"
+            );
+    }
+
+    private function filteredQuery()
+    {
+        $batchTable = (new BatchProductPrice)->getTable();
+        $priceTable = (new ProductPriceTable)->getTable();
+
+        return $this->baseQuery()
+            ->when($this->search, function ($query) use ($batchTable, $priceTable) {
+                $search = '%' . trim($this->search) . '%';
+
+                $query->where(function ($q) use ($search, $batchTable, $priceTable) {
+                    $q->where("$batchTable.batchno", 'like', $search)
+                        ->orWhere("$priceTable.state", 'like', $search);
+                });
+            })
+            ->when($this->batchFilter, function ($query) use ($batchTable) {
+                $query->where("$batchTable.batchno", $this->batchFilter);
+            })
+            ->when($this->stateFilter, function ($query) use ($priceTable) {
+                $query->where("$priceTable.state", $this->stateFilter);
             });
-        }
-
-        if ($this->batchFilter) {
-            $data = $data->where('batch_no', $this->batchFilter);
-        }
-
-        if ($this->stateFilter) {
-            $data = $data->where('state', $this->stateFilter);
-        }
-
-        return $data->values();
-    }
-
-    public function getTotalRecordsProperty()
-    {
-        return $this->filteredRows->count();
-    }
-
-    public function getTotalBoxQtyProperty()
-    {
-        return $this->filteredRows->sum('box_qty');
-    }
-
-    public function getTotalPcsQtyProperty()
-    {
-        return $this->filteredRows->sum('pcs_qty');
-    }
-
-    public function getTotalProductHoldingProperty()
-    {
-        return $this->filteredRows->sum('total_pcs');
     }
 
     public function render()
     {
-        $batchList = collect($this->rows)->pluck('batch_no')->unique()->values();
-        $stateList = collect($this->rows)->pluck('state')->unique()->values();
+        $batchTable = (new BatchProductPrice)->getTable();
+
+        $batchList = BatchProductPrice::where('pid', $this->productId)
+            ->whereNotNull('batchno')
+            ->pluck('batchno')
+            ->unique()
+            ->values();
+
+        $stateList = $this->baseQuery()
+            ->get()
+            ->pluck('state')
+            ->filter()
+            ->unique()
+            ->values();
+
+        $totalData = $this->filteredQuery()->get();
+
+        $tableData = $this->filteredQuery()
+            ->orderBy("$batchTable.id", 'desc')
+            ->paginate($this->perPage);
 
         return view('livewire.trackingbystate', [
-            'tableData' => $this->filteredRows,
+            'tableData' => $tableData,
             'batchList' => $batchList,
             'stateList' => $stateList,
+            'totalRecords' => $totalData->count(),
+            'totalBoxQty' => $totalData->sum('boxqty'),
+            'totalPcsQty' => $totalData->sum('pcsqty'),
+            'totalProductHolding' => $totalData->sum('totalqty'),
         ])->layout('layouts.header');
     }
 }

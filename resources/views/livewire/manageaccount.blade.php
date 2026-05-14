@@ -292,169 +292,114 @@
 </script>
 
 <script>
-    let currentPage = 1;
-    let recordsPerPage = 10;
+    document.addEventListener("DOMContentLoaded", function () {
+        let currentPage = 1;
+        let recordsPerPage = 10;
 
-    const searchInput = document.getElementById("searchInput");
-    const recordsPerPageSelect = document.getElementById("recordsPerPage");
-    const tableBody = document.getElementById("tableBody");
-    const rows = Array.from(tableBody.querySelectorAll("tr"));
+        const searchInput = document.getElementById("searchInput");
+        const recordsPerPageSelect = document.getElementById("recordsPerPage");
+        const tableBody = document.getElementById("tableBody");
+        const tableInfo = document.getElementById("tableInfo");
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const pageNumbers = document.getElementById("pageNumbers");
 
-    function getFilteredRows() {
-        let searchValue = searchInput.value.toLowerCase().trim();
-
-        return rows.filter(row => {
-            let username = row.children[0].innerText.toLowerCase();
-            let email = row.children[1].innerText.toLowerCase();
-            let password = row.children[2].innerText.toLowerCase();
-            let role = row.children[3].innerText.toLowerCase();
-
-            let select = row.children[4].querySelector("select");
-            let defineRole = select ? select.options[select.selectedIndex]?.text.toLowerCase() : "";
-
-            return username.includes(searchValue)
-                || email.includes(searchValue)
-                || password.includes(searchValue)
-                || role.includes(searchValue)
-                || defineRole.includes(searchValue);
-        });
-    }
-
-    function renderTable() {
-        let filteredRows = getFilteredRows();
-        let totalRecords = filteredRows.length;
-        let totalPages = Math.ceil(totalRecords / recordsPerPage);
-
-        if (totalPages === 0) {
-            totalPages = 1;
+        if (!searchInput || !recordsPerPageSelect || !tableBody) {
+            console.log("Search elements not found");
+            return;
         }
 
-        if (currentPage > totalPages) {
-            currentPage = totalPages;
+        let rows = Array.from(tableBody.querySelectorAll("tr"));
+
+        function getFilteredRows() {
+            let searchValue = searchInput.value.toLowerCase().trim();
+
+            return rows.filter(row => {
+                let rowText = row.innerText.toLowerCase();
+                return rowText.includes(searchValue);
+            });
         }
 
-        rows.forEach(row => {
-            row.style.display = "none";
-        });
+        function renderTable() {
+            let filteredRows = getFilteredRows();
+            let totalRecords = filteredRows.length;
+            let totalPages = Math.ceil(totalRecords / recordsPerPage);
 
-        let startIndex = (currentPage - 1) * recordsPerPage;
-        let endIndex = startIndex + recordsPerPage;
+            if (totalPages < 1) totalPages = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
 
-        filteredRows.slice(startIndex, endIndex).forEach(row => {
-            row.style.display = "";
-        });
-
-        let tableInfo = document.getElementById("tableInfo");
-
-        if (totalRecords === 0) {
-            tableInfo.innerText = "No records found";
-        } else {
-            tableInfo.innerText = `Showing ${startIndex + 1} to ${Math.min(endIndex, totalRecords)} of ${totalRecords} records`;
-        }
-
-        document.getElementById("prevBtn").disabled = currentPage === 1;
-        document.getElementById("nextBtn").disabled = currentPage === totalPages;
-
-        renderPageNumbers(totalPages);
-    }
-
-    function renderPageNumbers(totalPages) {
-        let pageNumbers = document.getElementById("pageNumbers");
-        pageNumbers.innerHTML = "";
-
-        for (let i = 1; i <= totalPages; i++) {
-            let button = document.createElement("button");
-            button.type = "button";
-            button.innerText = i;
-
-            button.className = i === currentPage
-                ? "btn btn-primary btn-sm mx-1"
-                : "btn btn-outline-primary btn-sm mx-1";
-
-            button.addEventListener("click", function () {
-                currentPage = i;
-                renderTable();
+            rows.forEach(row => {
+                row.style.display = "none";
             });
 
-            pageNumbers.appendChild(button);
+            let startIndex = (currentPage - 1) * recordsPerPage;
+            let endIndex = startIndex + recordsPerPage;
+
+            filteredRows.slice(startIndex, endIndex).forEach(row => {
+                row.style.display = "";
+            });
+
+            if (totalRecords === 0) {
+                tableInfo.innerText = "No records found";
+            } else {
+                tableInfo.innerText =
+                    `Showing ${startIndex + 1} to ${Math.min(endIndex, totalRecords)} of ${totalRecords} records`;
+            }
+
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages;
+
+            renderPageNumbers(totalPages);
         }
-    }
 
-    searchInput.addEventListener("keyup", function () {
-        currentPage = 1;
-        renderTable();
-    });
+        function renderPageNumbers(totalPages) {
+            pageNumbers.innerHTML = "";
 
-    recordsPerPageSelect.addEventListener("change", function () {
-        recordsPerPage = parseInt(this.value);
-        currentPage = 1;
-        renderTable();
-    });
+            for (let i = 1; i <= totalPages; i++) {
+                let button = document.createElement("button");
+                button.type = "button";
+                button.innerText = i;
 
-    document.getElementById("prevBtn").addEventListener("click", function () {
-        if (currentPage > 1) {
-            currentPage--;
+                button.className = i === currentPage
+                    ? "btn btn-primary btn-sm mx-1"
+                    : "btn btn-outline-primary btn-sm mx-1";
+
+                button.addEventListener("click", function () {
+                    currentPage = i;
+                    renderTable();
+                });
+
+                pageNumbers.appendChild(button);
+            }
+        }
+
+        searchInput.addEventListener("input", function () {
+            currentPage = 1;
             renderTable();
-        }
-    });
-
-    document.getElementById("nextBtn").addEventListener("click", function () {
-        let totalPages = Math.ceil(getFilteredRows().length / recordsPerPage);
-
-        if (currentPage < totalPages) {
-            currentPage++;
-            renderTable();
-        }
-    });
-
-    function cleanCSV(value) {
-        return `"${String(value).replace(/"/g, '""')}"`;
-    }
-
-    function downloadCSV() {
-        let filteredRows = getFilteredRows();
-
-        let csv = [];
-        csv.push([
-            "Username",
-            "Email",
-            "Password",
-            "Role",
-            "Define Role"
-        ].join(","));
-
-        filteredRows.forEach(row => {
-            let username = row.children[0].innerText.trim();
-            let email = row.children[1].innerText.trim();
-            let password = row.children[2].innerText.trim();
-            let role = row.children[3].innerText.trim();
-
-            let select = row.children[4].querySelector("select");
-            let defineRole = select ? select.options[select.selectedIndex]?.text.trim() : "";
-
-            csv.push([
-                cleanCSV(username),
-                cleanCSV(email),
-                cleanCSV(password),
-                cleanCSV(role),
-                cleanCSV(defineRole)
-            ].join(","));
         });
 
-        let csvContent = csv.join("\n");
-        let blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        recordsPerPageSelect.addEventListener("change", function () {
+            recordsPerPage = parseInt(this.value);
+            currentPage = 1;
+            renderTable();
+        });
 
-        let link = document.createElement("a");
-        let url = URL.createObjectURL(blob);
+        prevBtn.addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        });
 
-        link.setAttribute("href", url);
-        link.setAttribute("download", "user_details.csv");
-        link.style.display = "none";
+        nextBtn.addEventListener("click", function () {
+            let totalPages = Math.ceil(getFilteredRows().length / recordsPerPage);
 
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+            if (currentPage < totalPages) {
+                currentPage++;
+                renderTable();
+            }
+        });
 
-    renderTable();
+        renderTable();
+    });
 </script>

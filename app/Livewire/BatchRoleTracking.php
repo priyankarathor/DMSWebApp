@@ -6,163 +6,157 @@ use Livewire\Component;
 use App\Models\orderapprovedtable;
 use App\Models\productjunction;
 use App\Models\batchProductPrice as BatchProductPrice;
+use App\Models\userhierarchytab;
 
 class BatchRoleTracking extends Component
 {
-    public $batchId;
-    public $selectedBatchNo = '';
-    public $selectedState = '';
-    public $selectedRole = '';
-
+    public $batchId, $productId, $batch;
+    public $search = '', $selectedBatchNo = '', $selectedState = '', $selectedRole = '';
     public $data = [];
-    public $batch;
 
     public function mount($id)
     {
         $this->batchId = $id;
-        $this->batch = BatchProductPrice::find($id);
-
+        $this->batch = BatchProductPrice::findOrFail($id);
+        $this->productId = $this->batch->pid;
         $this->selectedBatchNo = $this->batch->batchno ?? '';
+        $this->loadData();
+    }
 
+    public function updated($field)
+    {
+        if (in_array($field, ['search', 'selectedBatchNo', 'selectedState', 'selectedRole'])) {
+            $this->loadData();
+        }
+    }
+
+    public function resetFilters()
+    {
+        $this->search = '';
+        $this->selectedBatchNo = $this->batch->batchno ?? '';
+        $this->selectedState = '';
+        $this->selectedRole = '';
         $this->loadData();
     }
 
     public function loadData()
     {
-        $batchQuery = BatchProductPrice::query();
+        $batchIds = BatchProductPrice::where('pid', $this->productId)
+            ->when($this->selectedBatchNo, fn($q) => $q->where('batchno', $this->selectedBatchNo))
+            ->pluck('id')
+            ->toArray();
 
-        if ($this->selectedBatchNo) {
-            $batchQuery->where('batchno', $this->selectedBatchNo);
+        if (empty($batchIds)) {
+            $this->data = [];
+            return;
         }
 
-        $batchIds = $batchQuery->pluck('id')->toArray();
-
-        $junctionRows = productjunction::whereIn('batchid', $batchIds)
+        $junctionGroups = productjunction::whereIn('batchid', $batchIds)
             ->get()
-            ->groupBy(function ($item) {
-                return $item->uid . '_' . $item->batchid;
-            });
+            ->groupBy(fn($item) => $item->uid . '_' . $item->batchid);
 
-        $this->data = $junctionRows->map(function ($items) {
+        $rows = $junctionGroups->map(function ($items) {
             $first = $items->first();
-
-            $inventoryQty = $items->sum(function ($row) {
-                return (int) ($row->inventery ?? 0);
-            });
 
             $batch = BatchProductPrice::find($first->batchid);
 
-            $order = orderapprovedtable::where('userid', $first->uid)
-                ->where('batchid', $first->batchid)
+            $inventoryQty = $items->sum(fn($row) => (int) ($row->inventery ?? 0));
+
+            $order = orderapprovedtable::where(function ($q) use ($first) {
+                    $q->where('userid', $first->uid)
+                      ->orWhere('approveuserid', $first->uid)
+                      ->orWhere('sellerid', $first->uid);
+                })
+                ->whereRaw("FIND_IN_SET(?, REPLACE(batchid, ' ', ''))", [(string) $first->batchid])
                 ->latest('id')
                 ->first();
 
+            $user = userhierarchytab::where(function ($q) use ($first) {
+                    $q->where('id', $first->uid)
+                      ->orWhere('registerid', $first->uid)
+                      ->orWhere('userId', $first->uid);
+                })
+                ->first();
+
             return [
-                'user_id' => $first->uid,
-                'batch_id' => $first->batchid,
-                'batchno' => $batch->batchno ?? 'N/A',
-                'state' => $order->region ?? 'N/A',
-                'role' => $order->userrole ?? 'N/A',
-                'name' => $order->username ?? 'N/A',
-                'box_qty' => 1,
-                'pcs_qty' => $inventoryQty,
+                'user_id'   => $first->uid,
+                'batch_id'  => $first->batchid,
+                'batchno'   => $batch->batchno ?? 'N/A',
+                'state'     => $order->region ?? $user->region ?? $user->state ?? 'N/A',
+                'role'      => $order->userrole ?? $user->role ?? $user->userrole ?? 'N/A',
+                'name'      => $order->username ?? $user->username ?? $user->name ?? 'N/A',
+                'pcs_qty'   => $inventoryQty,
                 'total_pcs' => $inventoryQty,
             ];
-        })->values()->toArray();
-    }
+        })->values();
 
-    public function updatedSelectedBatchNo()
-    {
-        $this->loadData();
-    }
+        if ($this->search) {
+            $search = strtolower(trim($this->search));
+            $rows = $rows->filter(fn($row) =>
+                str_contains(strtolower($row['user_id']), $search) ||
+                str_contains(strtolower($row['name']), $search) ||
+                str_contains(strtolower($row['role']), $search) ||
+                str_contains(strtolower($row['state']), $search) ||
+                str_contains(strtolower($row['batchno']), $search)
+            )->values();
+        }
 
-    public function resetFilters()
-    {
-        $this->selectedBatchNo = $this->batch->batchno ?? '';
-        $this->selectedState = '';
-        $this->selectedRole = '';
+        if ($this->selectedState) {
+            $rows = $rows->filter(fn($row) =>
+                strtolower($row['state']) === strtolower($this->selectedState)
+            )->values();
+        }
 
-        $this->loadData();
-    }
+        if ($this->selectedRole) {
+            $rows = $rows->filter(fn($row) =>
+                strtolower($row['role']) === strtolower($this->selectedRole)
+            )->values();
+        }
 
-    public function getFilteredDataProperty()
-    {
-        return collect($this->data)
-            ->filter(function ($item) {
-                $matchState = $this->selectedState
-                    ? strtolower($item['state']) === strtolower($this->selectedState)
-                    : true;
-
-                $matchRole = $this->selectedRole
-                    ? strtolower($item['role']) === strtolower($this->selectedRole)
-                    : true;
-
-                return $matchState && $matchRole;
-            })
-            ->values();
+        $this->data = $rows->toArray();
     }
 
     public function getDetailRowsProperty()
     {
-        return $this->filteredData;
+        return collect($this->data);
     }
 
     public function getRowsProperty()
     {
-        return $this->filteredData
+        return $this->detailRows
             ->groupBy('role')
-            ->map(function ($items, $role) {
-                return [
-                    'role' => $role,
-                    'users' => $items->count(),
-                    'box_qty' => $items->sum('box_qty'),
-                    'pcs_qty' => $items->sum('pcs_qty'),
-                    'total_pcs' => $items->sum('total_pcs'),
-                ];
-            })
+            ->map(fn($items, $role) => [
+                'role' => $role,
+                'users' => $items->count(),
+                'pcs_qty' => $items->sum('pcs_qty'),
+                'total_pcs' => $items->sum('total_pcs'),
+            ])
             ->values();
     }
 
     public function getTotalUsersProperty()
     {
-        return $this->filteredData->count();
-    }
-
-    public function getTotalBoxProperty()
-    {
-        return $this->filteredData->sum('box_qty');
+        return $this->detailRows->count();
     }
 
     public function getTotalPcsProperty()
     {
-        return $this->filteredData->sum('pcs_qty');
+        return $this->detailRows->sum('pcs_qty');
     }
 
     public function getGrandTotalPcsProperty()
     {
-        return $this->filteredData->sum('total_pcs');
+        return $this->detailRows->sum('total_pcs');
     }
 
     public function downloadCsv()
     {
         $rows = $this->detailRows;
 
-        $fileName = 'batch-role-tracking-' . now()->format('Y-m-d-H-i-s') . '.csv';
-
         return response()->streamDownload(function () use ($rows) {
             $file = fopen('php://output', 'w');
 
-            fputcsv($file, [
-                'Sr No',
-                'User ID',
-                'Role',
-                'Person Name',
-                'State',
-                'Batch No',
-                'Box Qty',
-                'PCS Qty',
-                'Total PCS',
-            ]);
+            fputcsv($file, ['Sr No', 'User ID', 'Role', 'Person Name', 'State', 'Batch No', 'PCS Stock Qty', 'Total PCS']);
 
             foreach ($rows as $index => $row) {
                 fputcsv($file, [
@@ -172,35 +166,26 @@ class BatchRoleTracking extends Component
                     $row['name'],
                     $row['state'],
                     $row['batchno'],
-                    $row['box_qty'],
                     $row['pcs_qty'],
                     $row['total_pcs'],
                 ]);
             }
 
             fclose($file);
-        }, $fileName);
+        }, 'batch-role-tracking-' . now()->format('Y-m-d-H-i-s') . '.csv');
     }
 
     public function render()
     {
-        $batches = BatchProductPrice::select('batchno')
+        $batches = BatchProductPrice::where('pid', $this->productId)
             ->whereNotNull('batchno')
-            ->distinct()
             ->orderBy('batchno')
-            ->pluck('batchno');
-
-        $states = collect($this->data)
-            ->pluck('state')
-            ->filter()
+            ->pluck('batchno')
             ->unique()
             ->values();
 
-        $roles = collect($this->data)
-            ->pluck('role')
-            ->filter()
-            ->unique()
-            ->values();
+        $states = collect($this->data)->pluck('state')->filter()->unique()->values();
+        $roles = collect($this->data)->pluck('role')->filter()->unique()->values();
 
         return view('livewire.batch-role-tracking', [
             'batches' => $batches,
