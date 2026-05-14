@@ -28,7 +28,7 @@ class Producteditpage extends Component
     public function render()
     {
         return view('livewire.producteditpage', [
-            'productcate' => categorytable::get(),
+            'productcate' => categorytable::where('type', '!=', 'master')->get(),
             'category' => categorytable::all(),
             'userrole' => userroletab::all(),
             'selectedVehicles' => $this->selectedVehicles,
@@ -41,7 +41,8 @@ class Producteditpage extends Component
 
         $product->productname = $request->productname;
         $product->description = $request->description;
-        // $product->category = $request->category;
+        $product->category = $request->category;
+        $product->categoryid = $request->categoryid;
 
         $product->vehicle = is_array($request->vehicle)
             ? implode(',', $request->vehicle)

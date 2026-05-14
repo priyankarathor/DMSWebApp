@@ -2,7 +2,8 @@
 
 <div class="container mt-4">
     <div class="row">
-        <form class="form" action="{{ url('/productdataedit/' . $productedit->id) }}" method="POST" enctype="multipart/form-data">
+        <form class="form" action="{{ url('/productdataedit/' . $productedit->id) }}" method="POST"
+            enctype="multipart/form-data">
             @csrf
 
             <div class="col-lg-12">
@@ -19,10 +20,24 @@
 
                             <div class="mb-3 col-md-4">
                                 <label class="mb-2">Product Name</label>
-                                <input class="form-control" type="text" name="productname" value="{{ $productedit->productname }}">
+                                <input class="form-control" type="text" name="productname"
+                                    value="{{ $productedit->productname }}">
                             </div>
 
-                         
+                            <div class="mb-3 col-md-4">
+    <label class="mb-2">Category</label>
+    <select class="form-control" name="categoryid" id="categorySelect" onchange="updateCategory(this)">
+        @foreach($productcate as $cat)
+            <option value="{{ $cat->id }}" 
+                data-name="{{ $cat->value }}"
+                {{ $productedit->categoryid == $cat->id ? 'selected' : '' }}>
+                {{ $cat->value }}
+            </option>
+        @endforeach
+    </select>
+    <input type="hidden" name="category" id="categoryName" 
+        value="{{ $productcate->firstWhere('id', $productedit->categoryid)?->value }}">
+</div>
 
 
                             <div class="mb-3 col-md-4">
@@ -32,18 +47,21 @@
 
                             <div class="mb-3 col-md-4">
                                 <label class="mb-2">Per Box PCS Quantity</label>
-                                <input class="form-control" type="text" id="quantity" name="quantity" value="{{ $productedit->quantity }}">
-                            </div>                            
+                                <input class="form-control" type="text" id="quantity" name="quantity"
+                                    value="{{ $productedit->quantity }}">
+                            </div>
 
                             <div class="mb-3 col-md-4">
                                 <label class="mb-2">Weight Number</label>
-                                <input class="form-control" type="text" name="weightnum" value="{{ $productedit->weightnum }}">
+                                <input class="form-control" type="text" name="weightnum"
+                                    value="{{ $productedit->weightnum }}">
                             </div>
 
 
                             <div class="mb-3 col-md-4">
                                 <label class="mb-2">HSN Code</label>
-                                <input class="form-control" type="text" name="hsncode" value="{{ $productedit->hsncode }}">
+                                <input class="form-control" type="text" name="hsncode"
+                                    value="{{ $productedit->hsncode }}">
                             </div>
 
                             <div class="mb-3 col-md-4">
@@ -63,15 +81,23 @@
 
                             <div class="mb-3 col-md-4">
                                 <label class="mb-2">Product Price</label>
-                                <input class="form-control" type="text" name="productprice" value="{{ $productedit->productprice }}">
+                                <input class="form-control" type="text" name="productprice"
+                                    value="{{ $productedit->productprice }}">
                             </div>
 
-                     
+                            <div class="mb-3 col-md-4">
+                                <label class="mb-2">Link</label>
+                                <input class="form-control" type="text" name="link" value="{{ $productedit->link }}">
+                            </div>
+
+
                             <div class="mb-3 col-md-4">
                                 <label class="mb-2">Status</label>
                                 <select class="form-control" name="action">
-                                    <option value="Active" {{ $productedit->Action == 'Active' ? 'selected' : '' }}>Active</option>
-                                    <option value="Disable" {{ $productedit->Action == 'Disable' ? 'selected' : '' }}>Disable</option>
+                                    <option value="Active" {{ $productedit->Action == 'Active' ? 'selected' : '' }}>Active
+                                    </option>
+                                    <option value="Disable" {{ $productedit->Action == 'Disable' ? 'selected' : '' }}>
+                                        Disable</option>
                                 </select>
                             </div>
 
@@ -81,7 +107,8 @@
 
                                 @if($productedit->file)
                                     <div class="mt-2">
-                                        <img src="{{ asset('image/' . $productedit->file) }}" width="90" height="90" style="object-fit:cover; border-radius:8px;">
+                                        <img src="{{ asset('image/' . $productedit->file) }}" width="90" height="90"
+                                            style="object-fit:cover; border-radius:8px;">
                                     </div>
                                 @endif
                             </div>
@@ -94,7 +121,8 @@
                                     <div class="mt-2 d-flex flex-wrap gap-2">
                                         @foreach(explode(',', $productedit->image) as $img)
                                             @if($img)
-                                                <img src="{{ asset($img) }}" width="80" height="80" style="object-fit:cover; border-radius:8px;">
+                                                <img src="{{ asset($img) }}" width="80" height="80"
+                                                    style="object-fit:cover; border-radius:8px;">
                                             @endif
                                         @endforeach
                                     </div>
@@ -108,25 +136,26 @@
 
                             <div class="col-md-12 mt-2">
                                 <label class="mb-2">Description</label>
-                                <textarea class="form-control" id="description" name="description">{{ $productedit->description }}</textarea>
+                                <textarea class="form-control" id="description"
+                                    name="description">{{ $productedit->description }}</textarea>
                             </div>
 
-                            
-                        <div class="text-end mt-4">
-                            <a href="{{ url('productlist') }}" class="btn btn-outline-secondary">
-                                Back
-                            </a>
 
-                            <button type="submit" class="btn btn-success">
-                                Update Product
-                            </button>
-                        </div>
+                            <div class="text-end mt-4">
+                                <a href="{{ url('productlist') }}" class="btn btn-outline-secondary">
+                                    Back
+                                </a>
+
+                                <button type="submit" class="btn btn-success">
+                                    Update Product
+                                </button>
+                            </div>
 
                         </div>
                     </div>
                 </div>
 
-                
+
             </div>
         </form>
     </div>
@@ -175,4 +204,9 @@
 
         calculateAll();
     });
+
+    function updateCategory(select) {
+        const selectedOption = select.options[select.selectedIndex];
+        document.getElementById('categoryName').value = selectedOption.getAttribute('data-name');
+    }
 </script>
