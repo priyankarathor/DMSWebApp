@@ -170,19 +170,19 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6">
                                     <div class="detail-card">
                                         <strong>Box Quantity:</strong><br>
                                         {{ $product->boxquantity }}
                                     </div>
-                                </div>
+                                </div> -->
 
-                                <div class="col-md-6">
+                                <!-- <div class="col-md-6">
                                     <div class="detail-card">
                                         <strong>Vehicle:</strong><br>
                                         {{ $product->vehicle ?? 'N/A' }}
                                     </div>
-                                </div>
+                                </div> -->
 
                                 <div class="col-md-6">
                                     <div class="detail-card">
