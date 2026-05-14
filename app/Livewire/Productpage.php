@@ -97,7 +97,7 @@ class Productpage extends Component
 
     public function getproduct(Request $request)
     {
-        $productName = $request->input('productname');
+        $productName = $request->input('pid');
         $batchNo = $request->input('batchno');
         $state = $request->input('state');
         $userRole = $request->input('role');
@@ -112,6 +112,7 @@ class Productpage extends Component
 
         $products = productadmintab::with([
             'batches' => function ($query) use ($batchNo, $state) {
+
                 // ✅ Only load batches that HAVE a matching price table for this state
                 if ($state) {
                     $query->whereHas('priceTable', function ($q) use ($state) {
@@ -133,7 +134,7 @@ class Productpage extends Component
             }
         ])
             ->when($productName, function ($query) use ($productName) {
-                $query->where('productname', 'LIKE', "%{$productName}%");
+                $query->where('id', 'LIKE', "%{$productName}%");
             })
             ->get();
 
@@ -146,27 +147,44 @@ class Productpage extends Component
 
         // Transform and apply role-based price filtering
         $products->transform(function ($product) use ($roleColumnMap, $userRole) {
+
             $product->batches->transform(function ($batch) use ($roleColumnMap, $userRole) {
+
                 if ($batch->priceTable) {
+
+                    // Convert batchnos into array
                     $batch->priceTable->batchnos_array = array_map(
                         'trim',
                         explode(',', $batch->priceTable->batchnos ?? '')
                     );
 
+                    // All price columns
+                    $allPriceCols = [
+                        'pricecndf',
+                        'pricedistributor',
+                        'pricedealer',
+                        'pricesubdealer',
+                        'priceretialer',
+                    ];
+
+                    // Apply role-based price selection
                     if ($userRole && isset($roleColumnMap[$userRole])) {
-                        $allPriceCols = [
-                            'pricecndf',
-                            'pricedistributor',
-                            'pricedealer',
-                            'pricesubdealer',
-                            'priceretialer',
-                        ];
-                        $toHide = array_diff($allPriceCols, [$roleColumnMap[$userRole]]);
-                        $batch->priceTable->makeHidden(array_values($toHide));
+
+                        // Get selected column name
+                        $selectedColumn = $roleColumnMap[$userRole];
+
+                        // Create new variable
+                        $batch->priceTable->productPrice =
+                            $batch->priceTable->{$selectedColumn};
+
+                        // Hide all original price columns
+                        $batch->priceTable->makeHidden($allPriceCols);
                     }
                 }
+
                 return $batch;
             });
+
             return $product;
         });
 
