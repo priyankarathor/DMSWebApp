@@ -110,7 +110,7 @@ class Productpage extends Component
             '12' => 'priceretialer',
         ];
 
-        $products = productadmintab::with([
+        $products = productadmintab::where('Action', 'Active')->with([
             'batches' => function ($query) use ($batchNo, $state) {
 
                 // ✅ Only load batches that HAVE a matching price table for this state
@@ -147,6 +147,11 @@ class Productpage extends Component
 
         // Transform and apply role-based price filtering
         $products->transform(function ($product) use ($roleColumnMap, $userRole) {
+
+            // ✅ Add full image URL
+            $product->image_url = $product->image
+                ? asset('' . $product->image)
+                : null;
 
             $product->batches->transform(function ($batch) use ($roleColumnMap, $userRole) {
 
