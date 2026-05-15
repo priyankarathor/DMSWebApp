@@ -38,15 +38,15 @@
             transition: .4s;
         }
 
-        input:checked + .slider {
+        input:checked+.slider {
             background-color: #115e0f;
         }
 
-        input:focus + .slider {
+        input:focus+.slider {
             box-shadow: 0 0 1px #115e0f;
         }
 
-        input:checked + .slider:before {
+        input:checked+.slider:before {
             transform: translateX(22px);
         }
 
@@ -142,8 +142,7 @@
 
                     <div class="row g-4 mb-4">
                         <div class="col-md-4 text-center">
-                            <img src="{{ asset('image/' . $product->file) }}"
-                                alt="Product Image"
+                            <img src="{{ asset('image/' . $product->file) }}" alt="Product Image"
                                 class="product-image shadow-sm">
                         </div>
 

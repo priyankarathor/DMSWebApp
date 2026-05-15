@@ -39,7 +39,7 @@ Route::get('/get_userroles', [Manageaccount::class, 'userroledata']);
 
 Route::get('/get_role', [Userrolepage::class, 'userrole']);
 
-Route::get('/get_productjunction', [Distributerorderlist::class, 'productjunctiondata']);
+Route::get('/get_inventory', [Distributerorderlist::class, 'productjunctiondata']);
 Route::get('/get_orderhistory', [Distributerorderlist::class, 'orderhistorydata']);
 
 Route::get('/get_hierarchy/{id}', [Distributorpage::class, 'getHierarchy']);

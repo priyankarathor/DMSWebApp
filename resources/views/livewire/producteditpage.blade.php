@@ -25,19 +25,18 @@
                             </div>
 
                             <div class="mb-3 col-md-4">
-    <label class="mb-2">Category</label>
-    <select class="form-control" name="categoryid" id="categorySelect" onchange="updateCategory(this)">
-        @foreach($productcate as $cat)
-            <option value="{{ $cat->id }}" 
-                data-name="{{ $cat->value }}"
-                {{ $productedit->categoryid == $cat->id ? 'selected' : '' }}>
-                {{ $cat->value }}
-            </option>
-        @endforeach
-    </select>
-    <input type="hidden" name="category" id="categoryName" 
-        value="{{ $productcate->firstWhere('id', $productedit->categoryid)?->value }}">
-</div>
+                                <label class="mb-2">Category</label>
+                                <select class="form-control" name="categoryid" id="categorySelect"
+                                    onchange="updateCategory(this)">
+                                    @foreach($productcate as $cat)
+                                        <option value="{{ $cat->id }}" data-name="{{ $cat->value }}" {{ $productedit->categoryid == $cat->id ? 'selected' : '' }}>
+                                            {{ $cat->value }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                <input type="hidden" name="category" id="categoryName"
+                                    value="{{ $productcate->firstWhere('id', $productedit->categoryid)?->value }}">
+                            </div>
 
 
                             <div class="mb-3 col-md-4">
@@ -46,7 +45,7 @@
                             </div>
 
                             <div class="mb-3 col-md-4">
-                                <label class="mb-2">Per Box PCS Quantity</label>
+                                <label class="mb-2">PCS Quantity</label>
                                 <input class="form-control" type="text" id="quantity" name="quantity"
                                     value="{{ $productedit->quantity }}">
                             </div>
@@ -129,7 +128,7 @@
                                 @endif
                             </div>
 
-                            <input type="hidden" name="link" value="{{ $productedit->link }}">
+                            <!-- <input type="hidden" name="link" value="{{ $productedit->link }}"> -->
                             <input type="hidden" name="metatag" value="{{ $productedit->metatag }}">
                             <input type="hidden" name="metadescription" value="{{ $productedit->metadescription }}">
                             <input type="hidden" name="metakeyword" value="{{ $productedit->metakeyword }}">
