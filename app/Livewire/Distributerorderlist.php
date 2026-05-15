@@ -51,9 +51,6 @@ class Distributerorderlist extends Component
     }
 
 
-
-
-
     /**
      * GET /api/get_inventory?uid=8
      * Returns full inventory details filtered by uid
@@ -210,7 +207,7 @@ class Distributerorderlist extends Component
                             'weightnum' => $item->weightnum,
                             'weightclass' => $item->weihgtclass,
                             'hsncode' => $item->hsncode,
-                            'image' => $item->image,
+                            'image' => $item->image ? asset('' . $item->image) : null,
                             'measurement' => $item->measurement,
 
                             'batch' => [

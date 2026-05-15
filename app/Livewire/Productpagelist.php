@@ -154,4 +154,18 @@ class Productpagelist extends Component
 
         return response()->stream($callback, 200, $headers);
     }
+
+    public function updateStatus($id, $status)
+    {
+        $product = productadmintab::find($id);
+
+        if ($product) {
+            // $status comes as true/false boolean from JS
+            $product->Action = $status ? 'Active' : 'Disable';
+            $product->save();
+            // No flash here — avoids page jump on every toggle
+        } else {
+            session()->flash('error', 'Product not found.');
+        }
+    }
 }
