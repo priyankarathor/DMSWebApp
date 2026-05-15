@@ -74,6 +74,9 @@ use App\Livewire\Trackingbystate;
 use App\Livewire\BatchRoleTracking;
 use App\Livewire\Brandadd;
 use App\Livewire\Userstockdetails;
+use App\Livewire\Batchedit;
+use App\Livewire\UserProductDetails;
+
 
 Route::middleware([
     'auth:sanctum',
@@ -266,7 +269,9 @@ Route::middleware([
 
     Route::get('/BatchRole/{id}', BatchRoleTracking::class)->name('BatchRole');
 
-    Route::get('/user-stock-details/{id}', Userstockdetails::class)->name('user.stock.details');
-    Route::get('/Stockholder/{sellerid}', Stockholder::class)->name('stockholder');
-    Route::get('/todaysell', Todaysell::class)->name('todaysell');
-});
+Route::get('/user-stock-details/{id}', Userstockdetails::class)->name('user.stock.details');
+Route::get('/Stockholder/{sellerid}', Stockholder::class)->name('stockholder');
+Route::get('/todaysell', Todaysell::class)->name('todaysell');
+
+Route::get('/user-product-details/{userId}', UserProductDetails::class)->name('user.product.details');
+}); 
