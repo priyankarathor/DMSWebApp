@@ -273,5 +273,8 @@ Route::get('/user-stock-details/{id}', Userstockdetails::class)->name('user.stoc
 Route::get('/Stockholder/{sellerid}', Stockholder::class)->name('stockholder');
 Route::get('/todaysell', Todaysell::class)->name('todaysell');
 
+
+Route::get('/batchedit/{id?}', Batchedit::class)->name('batchedit');
+
 Route::get('/user-product-details/{userId}', UserProductDetails::class)->name('user.product.details');
 }); 
