@@ -1,4 +1,5 @@
 <?php
+use App\Http\Controllers\Api\EmployeeController;
 use App\Http\Controllers\Api\UserLogin;
 use App\Livewire\Demoform;
 use App\Livewire\Distributorpage;
@@ -42,8 +43,28 @@ Route::get('/get_role', [Userrolepage::class, 'userrole']);
 Route::get('/get_inventory', [Distributerorderlist::class, 'productjunctiondata']);
 Route::get('/get_orderhistory', [Distributerorderlist::class, 'orderhistorydata']);
 
+Route::prefix('sell')->group(function () {
+    Route::post('/create/{id}', [Distributerorderlist::class, 'insertSellData']);
+
+    // Get orders by seller
+    Route::get('/get/{sellerid}', [Distributerorderlist::class, 'getSellerSellOrders']);
+});
+
 Route::get('/get_hierarchy/{id}', [Distributorpage::class, 'getHierarchy']);
 Route::get('/get_all_descendants/{id}', [Distributorpage::class, 'getAllDescendants']);
 
 
 Route::post('/login', [UserLogin::class, 'userlogin']);
+
+// 1. GET — load parent + grandparent details when form opens
+//    Frontend calls this with the parentId from the URL
+//    e.g. GET /api/get-parent-details/45
+Route::get('/get-parent-details/{parentId}', [EmployeeController::class, 'getParentDetails']);
+
+// 2. POST — create the new employee
+//    e.g. POST /api/create-employee   (JSON body)
+Route::post('/create-employee', [EmployeeController::class, 'createEmployee']);
+
+// 3. POST — set / reset password in manageaccounttables
+//    e.g. POST /api/set-password/115   (userId from userhierarchytabs in URL)
+Route::post('/set-password/{userId}', [EmployeeController::class, 'setPassword']);
