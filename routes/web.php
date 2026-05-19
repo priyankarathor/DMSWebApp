@@ -91,7 +91,7 @@ Route::middleware([
 
     Route::get('/productDetails/{id}', Productdetails::class)->name('productDetails');
 
-    Route::post('/viewstatus', [Productpagelist::class, 'status']);
+    // Route::post('/viewstatus', [Productpagelist::class, 'status']);
 
     Route::get('/distributor', Distributorpage::class)->name('distributor');
 
@@ -140,7 +140,7 @@ Route::middleware([
     Route::get('/distributerstock', Disstocklist::class)->name('distributerstock');
     Route::get('/alluser', Allusersform::class)->name('alluser');
     Route::post('/insertuserdata', [Allusersform::class, 'insertdata'])->name('insertuserdata');
-    Route::post('/viewstatus', [Productpagelist::class, 'status'])->name('viewstatus');
+    Route::post('/viewstatus', [Productpagelist::class, 'updateStatus'])->name('viewstatus');
     Route::get('/delproduct/{id}', [Productpagelist::class, 'deleteproduct'])->name('delproduct');
 
     Route::get('/manageaccount', Manageaccount::class)->name('manageaccount');
@@ -269,12 +269,12 @@ Route::middleware([
 
     Route::get('/BatchRole/{id}', BatchRoleTracking::class)->name('BatchRole');
 
-Route::get('/user-stock-details/{id}', Userstockdetails::class)->name('user.stock.details');
-Route::get('/Stockholder/{sellerid}', Stockholder::class)->name('stockholder');
-Route::get('/todaysell', Todaysell::class)->name('todaysell');
+    Route::get('/user-stock-details/{id}', Userstockdetails::class)->name('user.stock.details');
+    Route::get('/Stockholder/{sellerid}', Stockholder::class)->name('stockholder');
+    Route::get('/todaysell', Todaysell::class)->name('todaysell');
 
 
-Route::get('/batchedit/{id?}', Batchedit::class)->name('batchedit');
+    Route::get('/batchedit/{id?}', Batchedit::class)->name('batchedit');
 
-Route::get('/user-product-details/{userId}', UserProductDetails::class)->name('user.product.details');
-}); 
+    Route::get('/user-product-details/{userId}', UserProductDetails::class)->name('user.product.details');
+});

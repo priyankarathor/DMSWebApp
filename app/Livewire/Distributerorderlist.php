@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Livewire;
+use App\Models\batchProductPrice;
 use App\Models\orderlisttab;
 use App\Models\userhierarchytab;
 use App\Models\productadmintab;
@@ -50,7 +51,161 @@ class Distributerorderlist extends Component
         ], 200);
     }
 
+    /**
+     * Create a sell order (Distributor-to-Retailer)
+     */
+    public function insertSellData(Request $request, $id)
+    {
+        DB::transaction(function () use ($request, $id) {
+            // Fetch the order to be sold
+            $order = orderlisttab::findOrFail($id);
 
+            $priceIds = $this->csvArray($order->priceId);
+            $batchIds = $this->csvArray($order->batchId);
+
+            // Get input arrays from request
+            $pridList = $request->input('prid', []);
+            $productNames = $request->input('productname', []);
+            $productquantity = $request->input('productquantity', []);
+            $bulkmasurment = $request->input('bulkmasurment', []);
+            $bulktotalqty = $request->input('bulktotalqty', []);
+            $productbulkList = $request->input('productbulk', []);
+            $gstrate = $request->input('gstrate', []);
+            $sgst = $request->input('sgst', []);
+            $cgst = $request->input('cgst', []);
+            $igst = $request->input('igst', []);
+            $amount = $request->input('amount', []);
+            $hsn = $request->input('hsn', []);
+            $selectgst = $request->input('selectgst', []);
+            $totalamount = $request->input('totalamount', []);
+
+            // Get discount data if applicable
+            $discountData = $this->getDiscountDetailsByUserId($request->userid);
+
+            // Create new sell/approved order record
+            $sellorder = new orderapprovedtable();
+
+            $sellorder->discount = $discountData['total_discount'] ?? 0;
+            $sellorder->approveuserid = $request->sellerid; // The seller/distributor
+            $sellorder->invoiceno = $request->invoicenum;
+            $sellorder->invoicedate = $request->invoicedate;
+            $sellorder->framname = $request->framname;
+            $sellorder->gstnumber = $request->gstnumber;
+            $sellorder->username = $request->buyername;
+            $sellorder->contactno = $request->buyercontact;
+            $sellorder->email = $request->buyeremail;
+            $sellorder->region = $request->buyerregion;
+            $sellorder->address = $request->buyeraddress;
+            $sellorder->userrole = $request->buyerrole;
+            $sellorder->drivername = $request->drivername;
+            $sellorder->drivercompany = $request->drivercompany;
+            $sellorder->vehicleno = $request->vehicleno;
+            $sellorder->drivercontact = $request->drivercontact;
+            $sellorder->udyamno = $request->udyamno;
+            $sellorder->roleid = $request->buyerroleid;
+            $sellorder->userid = $request->userid; // The buyer/retailer
+            $sellorder->sellerid = $request->sellerid; // The seller/distributor
+
+            // Store as comma-separated values
+            $sellorder->priceid = implode(',', $priceIds);
+            $sellorder->batchid = implode(',', $batchIds);
+            $sellorder->productid = implode(',', $pridList);
+            $sellorder->productname = implode(',', $productNames);
+            $sellorder->productquantity = implode(',', $productquantity);
+            $sellorder->measurement = implode(',', $bulkmasurment);
+            $sellorder->totalpcs = implode(',', $bulktotalqty);
+            $sellorder->productbulk = implode(',', $productbulkList);
+            $sellorder->gstrate = implode(',', $gstrate);
+            $sellorder->sgst = implode(',', $sgst);
+            $sellorder->cgst = implode(',', $cgst);
+            $sellorder->igst = implode(',', $igst);
+            $sellorder->amount = implode(',', $amount);
+            $sellorder->hsnno = implode(',', $hsn);
+            $sellorder->selectgst = implode(',', $selectgst);
+            $sellorder->totalamount = implode(',', $totalamount);
+
+            $sellorder->save();
+
+            // Update inventory for each product
+            foreach ($pridList as $index => $prid) {
+                $currentProductBulk = (float) ($productbulkList[$index] ?? 0);
+                $currentPriceId = $priceIds[$index] ?? null;
+                $currentBatchId = $batchIds[$index] ?? null;
+
+                // Check if buyer already has this product in inventory
+                $existingRecord = productjunction::where('rid', $request->buyerroleid)
+                    ->where('uid', $request->userid)
+                    ->where('pid', $prid)
+                    ->where('priceid', $currentPriceId)
+                    ->where('batchid', $currentBatchId)
+                    ->first();
+
+                if ($existingRecord) {
+                    // Update existing inventory
+                    $existingRecord->inventery += $currentProductBulk;
+                    $existingRecord->save();
+                } else {
+                    // Create new inventory entry for buyer
+                    productjunction::create([
+                        'rid' => $request->buyerroleid,
+                        'uid' => $request->userid,
+                        'pid' => $prid,
+                        'inventery' => $currentProductBulk,
+                        'priceid' => $currentPriceId,
+                        'batchid' => $currentBatchId,
+                        'sellerid' => $request->sellerid
+                    ]);
+                }
+
+                // Reduce seller's inventory/batch stock
+                if (!empty($currentBatchId)) {
+                    $batchProduct = batchProductPrice::find($currentBatchId);
+
+                    if ($batchProduct) {
+                        $batchProduct->inventoryqty = max(
+                            0,
+                            (float) $batchProduct->inventoryqty - $currentProductBulk
+                        );
+                        $batchProduct->save();
+                    }
+                }
+            }
+
+            // Remove the original order after processing
+            $this->removeApprovedItems($order);
+
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sell order created successfully',
+        ], 201);
+    }
+
+    /**
+     * Get all sell orders for a seller
+     */
+    public function getSellerSellOrders($sellerid)
+    {
+        try {
+            $sellorders = orderapprovedtable::where('sellerid', $sellerid)
+                ->orderBy('created_at', 'desc')
+                ->paginate(20);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sell orders retrieved successfully',
+                'data' => $sellorders
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to retrieve sell orders',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 
 
 
@@ -210,7 +365,7 @@ class Distributerorderlist extends Component
                             'weightnum' => $item->weightnum,
                             'weightclass' => $item->weihgtclass,
                             'hsncode' => $item->hsncode,
-                            'image' => $item->image,
+                            'image' => $item->image ? asset('' . $item->image) : null,
                             'measurement' => $item->measurement,
 
                             'batch' => [

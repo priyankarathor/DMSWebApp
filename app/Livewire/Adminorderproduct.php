@@ -14,26 +14,27 @@ class Adminorderproduct extends Component
 
     // Mount the component with the order ID
     public function mount($id)
-    {       
+    {
         $this->orderId = $id;
         $this->orderproduct = orderlisttab::where('id', $id)->first();
     }
 
     public function render()
-{
-    $productIds = array_map('trim', explode(',', $this->orderproduct->pid));
+    {
+        $productIds = array_map('trim', explode(',', $this->orderproduct->pid));
 
-    $products = productadmintab::whereIn('id', $productIds)->get();
+        $products = productadmintab::whereIn('id', $productIds)->get();
 
-    return view('livewire.adminorderproduct', [
-        'products' => $products
-    ])->layout('layouts.header');
-}
+        return view('livewire.adminorderproduct', [
+            'products' => $products
+        ])->layout('layouts.header');
+    }
 
-    public function orderupload(Request $data,$id){
+    public function orderupload(Request $data, $id)
+    {
         $statusupdate = orderlisttab::where('id', $id)->first();
 
-        $orderstatus = implode(',', $data->orderstatus); 
+        $orderstatus = implode(',', $data->orderstatus);
         $statusupdate->orderstatus = $orderstatus;
 
         $statusupdate->save();
@@ -46,8 +47,8 @@ class Adminorderproduct extends Component
         $orderProduct = OrderProduct::find($id);
         $orderProduct->status = $request->status;
         $orderProduct->save();
-    
+
         return response()->json(['success' => true]);
     }
-    
+
 }

@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalRows = rows.length;
 
         let current_page = 1;
-        let records_per_page = 5;
+        let records_per_page = 10;
 
         function changePage(page) {
             const pageInfo = document.getElementById('page-info');
@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const totalRows = rows.length;
 
         let current_page = 1;
-        let records_per_page = 5;
+        let records_per_page = 10;
 
         function changePage(page) {
             const pageInfo = document.getElementById('page-info');

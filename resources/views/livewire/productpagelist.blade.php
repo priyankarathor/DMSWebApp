@@ -1,5 +1,5 @@
 <div>
-    <script src="{{ asset('assets/js/custom.js') }}"></script>
+
 
     <style>
         .switch {
@@ -38,15 +38,15 @@
             transition: .4s;
         }
 
-        input:checked + .slider {
+        input:checked+.slider {
             background-color: #115e0f;
         }
 
-        input:focus + .slider {
+        input:focus+.slider {
             box-shadow: 0 0 1px #115e0f;
         }
 
-        input:checked + .slider:before {
+        input:checked+.slider:before {
             transform: translateX(26px);
         }
 
@@ -90,7 +90,7 @@
             position: absolute;
             background-color: #f9f9f9;
             min-width: 100px;
-            box-shadow: 0px 8px 16px rgba(0,0,0,0.2);
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
             z-index: 1;
             right: 0;
         }
@@ -146,12 +146,14 @@
                                 <!--</a>-->
 
                                 <a href="{{ route('product-import') }}">
-                                    <button class="btn btn-outline-success mt-1" style="font-size:15px; border-radius:40px;">
+                                    <button class="btn btn-outline-success mt-1"
+                                        style="font-size:15px; border-radius:40px;">
                                         Add Product By CSV +
                                     </button>
                                 </a>
 
-                                <button wire:click="downloadCsv" class="btn btn-outline-success mt-1" style="font-size:15px; border-radius:40px;">
+                                <button wire:click="downloadCsv" class="btn btn-outline-success mt-1"
+                                    style="font-size:15px; border-radius:40px;">
                                     CSV Download
                                 </button>
                             </div>
@@ -160,12 +162,8 @@
                                 <div class="row justify-content-end">
                                     <div class="d-flex align-items-center">
                                         <span class="form-label me-2">Search:</span>
-                                        <input
-                                            type="text"
-                                            class="form-control"
-                                            wire:model.live="search"
-                                            placeholder="Search table data..."
-                                        >
+                                        <input type="text" class="form-control" wire:model.live="search"
+                                            placeholder="Search table data...">
                                     </div>
                                 </div>
                             </div>
@@ -176,10 +174,11 @@
                             <div class="col-md-3 d-flex align-items-center">
                                 <span class="me-2">Show:</span>
                                 <select wire:model.live="perPage" class="form-control" style="width:100px;">
+
                                     <option value="10">10</option>
                                     <option value="20">20</option>
-                                     <option value="50">50</option>
-                                      <option value="100">100</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
                                 </select>
                                 <span class="ms-2">records</span>
                             </div>
@@ -189,7 +188,7 @@
                     <div class="card-body">
 
                         <div class="table-responsive">
-                            <table class="table mb-0" id="myTable">
+                            <table class="table mb-0">
                                 <thead class="thead-light">
                                     <tr>
                                         <th>Sr No.</th>
@@ -205,7 +204,7 @@
 
                                 <tbody>
                                     @forelse ($product as $index => $products)
-                                        <tr>
+                                        <tr wire:key="product-{{ $products->id }}">
                                             <th scope="row">
                                                 {{ ($product->currentPage() - 1) * $product->perPage() + $index + 1 }}
                                             </th>
@@ -217,42 +216,38 @@
 
                                             <td>
                                                 <a href="{{ url('productDetails/' . $products->id) }}"
-                                                   class="btn btn-outline-success rounded-circle">
+                                                    class="btn btn-outline-success rounded-circle">
                                                     <i class="bi bi-eye-fill"></i>
                                                 </a>
                                             </td>
 
                                             <td>
-                                                <label class="switch" id="statusid{{ $products->id }}">
-                                                    <input
-                                                        type="checkbox"
-                                                        onchange="updateStatus({{ $products->id }})"
+                                                <label class="switch">
+                                                    <input type="checkbox"
+                                                        wire:change="updateStatus({{ $products->id }}, $event.target.checked)"
                                                         {{ $products->Action == 'Active' ? 'checked' : '' }}
-                                                    >
+                                                        wire:key="status-{{ $products->id }}">
                                                     <span class="slider round"></span>
                                                 </label>
                                             </td>
 
                                             <td>
                                                 <div class="btn-group dropstart">
-                                                    <button type="button"
-                                                            class="btn btn-outline-success dropdown-toggle"
-                                                            data-bs-toggle="dropdown"
-                                                            aria-expanded="false">
+                                                    <button type="button" class="btn btn-outline-success dropdown-toggle"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
                                                         Action
                                                     </button>
 
                                                     <ul class="dropdown-menu">
                                                         <li>
-                                                            <a class="dropdown-item" href="{{ url('/productedit/' . $products->id) }}">
+                                                            <a class="dropdown-item"
+                                                                href="{{ url('/productedit/' . $products->id) }}">
                                                                 Edit
                                                             </a>
                                                         </li>
 
                                                         <li>
-                                                            <button
-                                                                type="button"
-                                                                class="dropdown-item"
+                                                            <button type="button" class="dropdown-item"
                                                                 onclick="confirm('Are you sure you want to delete this product?') || event.stopImmediatePropagation()"
                                                                 wire:click="deleteproduct({{ $products->id }})">
                                                                 Delete
@@ -284,34 +279,5 @@
         </div>
     </div>
 
-    <script>
-        function updateStatus(id) {
-            let checkbox = document.querySelector('#statusid' + id + ' input[type="checkbox"]');
-            let status = checkbox.checked ? 'Active' : 'Disable';
 
-            fetch('{{ route("viewstatus") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({
-                    id: id,
-                    Action: status
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    alert(data.error);
-                } else {
-                    alert('Status updated to ' + data.status);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Something went wrong.');
-            });
-        }
-    </script>
 </div>
