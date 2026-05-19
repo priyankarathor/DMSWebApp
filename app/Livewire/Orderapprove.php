@@ -249,47 +249,79 @@ class Orderapprove extends Component
             $ordervalue->sellerid = $request->adminid;
             $ordervalue->save();
 
-            foreach ($pridList as $index => $prid) {
-                $currentProductBulk = (float) ($productbulkList[$index] ?? 0);
-                $currentPriceId = $priceIds[$index] ?? null;
-                $currentBatchId = $batchIds[$index] ?? null;
+           foreach ($pridList as $index => $prid) {
+    $currentProductBulk = (float) ($productbulkList[$index] ?? 0);
+    $currentPriceId = $priceIds[$index] ?? null;
+    $currentBatchId = $batchIds[$index] ?? null;
 
-                $existingRecord = productjunction::where('rid', $request->roleid)
-                    ->where('uid', $request->userid)
-                    ->where('pid', $prid)
-                    ->where('priceid', $currentPriceId)
-                    ->where('batchid', $currentBatchId)
-                    ->first();
+    /*
+    |--------------------------------------------------------------------------
+    | 1. Add inventory to current buyer/user productjunction
+    |--------------------------------------------------------------------------
+    */
+    $existingRecord = productjunction::where('rid', $request->roleid)
+        ->where('uid', $request->userid)
+        ->where('pid', $prid)
+        ->where('priceid', $currentPriceId)
+        ->where('batchid', $currentBatchId)
+        ->first();
 
-                if ($existingRecord) {
-                    $existingRecord->inventery += $currentProductBulk;
-                    $existingRecord->save();
-                } else {
-                    productjunction::create([
-                        'rid' => $request->roleid,
-                        'uid' => $request->userid,
-                        'pid' => $prid,
-                        'inventery' => $currentProductBulk,
-                        'priceid' => $currentPriceId,
-                        'batchid' => $currentBatchId,
-                        'sellerid' => $request->adminid
-                    ]);
-                }
+    if ($existingRecord) {
+        $existingRecord->inventery += $currentProductBulk;
+        $existingRecord->save();
+    } else {
+        productjunction::create([
+            'rid' => $request->roleid,
+            'uid' => $request->userid,
+            'pid' => $prid,
+            'inventery' => $currentProductBulk,
+            'priceid' => $currentPriceId,
+            'batchid' => $currentBatchId,
+            'sellerid' => $request->adminid
+        ]);
+    }
 
-                if (!empty($currentBatchId)) {
-                    $batchProduct = batchProductPrice::find($currentBatchId);
+    /*
+    |--------------------------------------------------------------------------
+    | 2. Deduct inventory
+    |--------------------------------------------------------------------------
+    | If roleid/rid == 1 => deduct from batch_product_prices table
+    | Else => deduct from seller's productjunction inventory
+    |--------------------------------------------------------------------------
+    */
+    if ((int) $request->roleid === 1) {
 
-                    if ($batchProduct) {
-                        $batchProduct->inventoryqty = max(
-                            0,
-                            (float) $batchProduct->inventoryqty - $currentProductBulk
-                        );
+        if (!empty($currentBatchId)) {
+            $batchProduct = batchProductPrice::find($currentBatchId);
 
-                        $batchProduct->save();
-                    }
-                }
+            if ($batchProduct) {
+                $batchProduct->inventoryqty = max(
+                    0,
+                    (float) $batchProduct->inventoryqty - $currentProductBulk
+                );
+
+                $batchProduct->save();
             }
+        }
 
+    } else {
+
+        $sellerStock = productjunction::where('pid', $prid)
+            ->where('priceid', $currentPriceId)
+            ->where('batchid', $currentBatchId)
+            ->where('uid', $request->adminid)
+            ->first();
+
+        if ($sellerStock) {
+            $sellerStock->inventery = max(
+                0,
+                (float) $sellerStock->inventery - $currentProductBulk
+            );
+
+            $sellerStock->save();
+        }
+    }
+}
             $this->removeApprovedItems($order);
         });
 
