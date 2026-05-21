@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Models\Godown;
+use App\Models\location;
 use Livewire\Component;
 use Livewire\WithPagination;
 use App\Models\Productadmintab;
@@ -33,6 +35,10 @@ class Productdetails extends Component
     public $editSubDealer;
     public $editRetailer;
 
+    public $editGodownId;
+    public $editLocation;
+    public $editRetailergodown;
+
     protected $queryString = [
         'stateSearch' => ['except' => ''],
         'batchSearch' => ['except' => ''],
@@ -44,15 +50,33 @@ class Productdetails extends Component
 
     public function mount($id)
     {
-        $this->product = Productadmintab::with(['batches', 'prices'])->findOrFail($id);
+        $this->product = Productadmintab::with(['batches', 'prices', 'godowns'])->findOrFail($id);
     }
 
-    public function updatingStateSearch() { $this->resetAllPages(); }
-    public function updatingBatchSearch() { $this->resetAllPages(); }
-    public function updatingStatusFilter() { $this->resetAllPages(); }
-    public function updatingVehicleFilter() { $this->resetAllPages(); }
-    public function updatingBatchStateFilter() { $this->resetAllPages(); }
-    public function updatingBatchNoFilter() { $this->resetAllPages(); }
+    public function updatingStateSearch()
+    {
+        $this->resetAllPages();
+    }
+    public function updatingBatchSearch()
+    {
+        $this->resetAllPages();
+    }
+    public function updatingStatusFilter()
+    {
+        $this->resetAllPages();
+    }
+    public function updatingVehicleFilter()
+    {
+        $this->resetAllPages();
+    }
+    public function updatingBatchStateFilter()
+    {
+        $this->resetAllPages();
+    }
+    public function updatingBatchNoFilter()
+    {
+        $this->resetAllPages();
+    }
 
     private function resetAllPages()
     {
@@ -98,7 +122,7 @@ class Productdetails extends Component
     private function cleanBatchNos($batchNos)
     {
         return collect(explode(',', str_replace(["'", '"'], '', $batchNos ?? '')))
-            ->map(fn ($item) => trim($item))
+            ->map(fn($item) => trim($item))
             ->filter()
             ->unique()
             ->values();
@@ -268,141 +292,181 @@ class Productdetails extends Component
         session()->flash('success', 'Price updated successfully.');
         $this->dispatch('close-edit-price-modal');
     }
+
+
+    public function editGodown($id)
+    {
+        $godown = Godown::where('pid', $this->product->id)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $this->editGodownId = $godown->id;
+        $this->editLocation = $godown->locationid ?? '';
+        $this->editRetailergodown = $godown->retailer_name ?? '';
+
+        $this->dispatch('open-edit-godown-modal');
+    }
+
+    public function updateGodown()
+    {
+        $this->validate([
+            'editLocation' => 'required|string|max:255',
+            'editRetailergodown' => 'required|string|max:255',
+        ]);
+
+        $godown = Godown::where('pid', $this->product->id)
+            ->where('id', $this->editGodownId)
+            ->firstOrFail();
+
+        $godown->update([
+            'locationid' => $this->editLocation,
+            'retailer_name' => $this->editRetailergodown,
+        ]);
+
+        $this->reset([
+            'editGodownId',
+            'editLocation',
+            'editRetailer',
+        ]);
+
+        session()->flash('success', 'Godown updated successfully.');
+        $this->dispatch('close-edit-godown-modal');
+    }
+
     public function downloadCsv()
-{
-    $data = $this->getFilteredData();
-    $rows = $data['batchMappedRows'];
+    {
+        $data = $this->getFilteredData();
+        $rows = $data['batchMappedRows'];
 
-    return response()->streamDownload(function () use ($rows) {
-        $handle = fopen('php://output', 'w');
+        return response()->streamDownload(function () use ($rows) {
+            $handle = fopen('php://output', 'w');
 
-        fputcsv($handle, [
-            'Sr No',
-            'Batch ID',
-            'Product ID',
-            'Batch No',
-            'Box Qty',
-            'PCS Qty',
-            'Total PCS',
-            'Inventory',
-            'State',
-            'CNDF Price',
-            'Distributor Price',
-            'Dealer Price',
-            'Sub Dealer Price',
-            'Retailer Price',
-        ]);
-
-        foreach ($rows as $index => $row) {
             fputcsv($handle, [
-                $index + 1,
-                $row['batch_id'] ?? '',
-                $row['product_id'] ?? '',
-                $row['batchno'] ?? '',
-                $row['boxqty'] ?? '',
-                $row['pcsqty'] ?? '',
-                $row['totalqty'] ?? '',
-                $row['inventoryqty'] ?? '',
-                $row['state'] ?? '',
-                $row['pricecndf'] ?? '',
-                $row['pricedistributor'] ?? '',
-                $row['pricedealer'] ?? '',
-                $row['pricesubdealer'] ?? '',
-                $row['priceretialer'] ?? '',
+                'Sr No',
+                'Batch ID',
+                'Product ID',
+                'Batch No',
+                'Box Qty',
+                'PCS Qty',
+                'Total PCS',
+                'Inventory',
+                'State',
+                'CNDF Price',
+                'Distributor Price',
+                'Dealer Price',
+                'Sub Dealer Price',
+                'Retailer Price',
             ]);
-        }
 
-        fclose($handle);
-    }, 'batch_wise_price_mapping_' . now()->format('Ymd_His') . '.csv');
-}
+            foreach ($rows as $index => $row) {
+                fputcsv($handle, [
+                    $index + 1,
+                    $row['batch_id'] ?? '',
+                    $row['product_id'] ?? '',
+                    $row['batchno'] ?? '',
+                    $row['boxqty'] ?? '',
+                    $row['pcsqty'] ?? '',
+                    $row['totalqty'] ?? '',
+                    $row['inventoryqty'] ?? '',
+                    $row['state'] ?? '',
+                    $row['pricecndf'] ?? '',
+                    $row['pricedistributor'] ?? '',
+                    $row['pricedealer'] ?? '',
+                    $row['pricesubdealer'] ?? '',
+                    $row['priceretialer'] ?? '',
+                ]);
+            }
 
-public function downloadFullProductCsv()
-{
-    $product = Productadmintab::with(['batches', 'prices'])
-        ->findOrFail($this->product->id);
+            fclose($handle);
+        }, 'batch_wise_price_mapping_' . now()->format('Ymd_His') . '.csv');
+    }
 
-    return response()->streamDownload(function () use ($product) {
+    public function downloadFullProductCsv()
+    {
+        $product = Productadmintab::with(['batches', 'prices'])
+            ->findOrFail($this->product->id);
 
-        $handle = fopen('php://output', 'w');
+        return response()->streamDownload(function () use ($product) {
 
-        fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            $handle = fopen('php://output', 'w');
 
-        fputcsv($handle, [
-            'Product ID',
-            'Product Name',
-            'Category',
-            'Vehicle',
-            'Description',
-            'Total PCS',
-            'Box Quantity',
-            'Status',
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
-            'Batch ID',
-            'Batch No',
-            'Box Qty',
-            'PCS Qty',
-            'Total Qty',
-            'Inventory Qty',
+            fputcsv($handle, [
+                'Product ID',
+                'Product Name',
+                'Category',
+                'Vehicle',
+                'Description',
+                'Total PCS',
+                'Box Quantity',
+                'Status',
 
-            'State',
-            'CNDF Price',
-            'Distributor Price',
-            'Dealer Price',
-            'Sub Dealer Price',
-            'Retailer Price',
-        ]);
+                'Batch ID',
+                'Batch No',
+                'Box Qty',
+                'PCS Qty',
+                'Total Qty',
+                'Inventory Qty',
 
-        foreach ($product->batches as $batch) {
+                'State',
+                'CNDF Price',
+                'Distributor Price',
+                'Dealer Price',
+                'Sub Dealer Price',
+                'Retailer Price',
+            ]);
 
-            foreach ($product->prices as $price) {
+            foreach ($product->batches as $batch) {
 
-                $batchNosArray = collect(
-                    explode(',', str_replace(["'", '"'], '', $price->batchnos ?? ''))
-                )->map(fn ($item) => trim($item))
-                 ->filter()
-                 ->values();
+                foreach ($product->prices as $price) {
 
-                $batchId = (string) ($batch->id ?? '');
-                $batchNo = trim((string) ($batch->batchno ?? ''));
+                    $batchNosArray = collect(
+                        explode(',', str_replace(["'", '"'], '', $price->batchnos ?? ''))
+                    )->map(fn($item) => trim($item))
+                        ->filter()
+                        ->values();
 
-                $matched = $batchNosArray->contains($batchId)
-                    || $batchNosArray->contains($batchNo);
+                    $batchId = (string) ($batch->id ?? '');
+                    $batchNo = trim((string) ($batch->batchno ?? ''));
 
-                if ($matched) {
+                    $matched = $batchNosArray->contains($batchId)
+                        || $batchNosArray->contains($batchNo);
 
-                    fputcsv($handle, [
+                    if ($matched) {
 
-                        $product->id,
-                        $product->productname ?? '',
-                        $product->category ?? '',
-                        $product->vehicle ?? '',
-                        strip_tags($product->description ?? ''),
-                        $product->quantity ?? '',
-                        $product->boxquantity ?? '',
-                        $product->Action ? 'Active' : 'Inactive',
+                        fputcsv($handle, [
 
-                        $batch->id ?? '',
-                        $batch->batchno ?? '',
-                        $batch->boxqty ?? $batch->qty ?? 0,
-                        $batch->pcsqty ?? $batch->maxqty ?? 0,
-                        $batch->totalqty ?? 0,
-                        $batch->inventoryqty ?? 0,
+                            $product->id,
+                            $product->productname ?? '',
+                            $product->category ?? '',
+                            $product->vehicle ?? '',
+                            strip_tags($product->description ?? ''),
+                            $product->quantity ?? '',
+                            $product->boxquantity ?? '',
+                            $product->Action ? 'Active' : 'Inactive',
 
-                        $price->state ?? '',
-                        $price->pricecndf ?? 0,
-                        $price->pricedistributor ?? 0,
-                        $price->pricedealer ?? 0,
-                        $price->pricesubdealer ?? 0,
-                        $price->priceretialer ?? 0,
-                    ]);
+                            $batch->id ?? '',
+                            $batch->batchno ?? '',
+                            $batch->boxqty ?? $batch->qty ?? 0,
+                            $batch->pcsqty ?? $batch->maxqty ?? 0,
+                            $batch->totalqty ?? 0,
+                            $batch->inventoryqty ?? 0,
+
+                            $price->state ?? '',
+                            $price->pricecndf ?? 0,
+                            $price->pricedistributor ?? 0,
+                            $price->pricedealer ?? 0,
+                            $price->pricesubdealer ?? 0,
+                            $price->priceretialer ?? 0,
+                        ]);
+                    }
                 }
             }
-        }
 
-        fclose($handle);
-
-    }, 'full_product_details_' . $product->id . '_' . now()->format('Ymd_His') . '.csv');
-}
+            fclose($handle);
+        }, 'full_product_details_' . $product->id . '_' . now()->format('Ymd_His') . '.csv');
+    }
 
     public function deleteproduct($id)
     {
@@ -421,10 +485,26 @@ public function downloadFullProductCsv()
     {
         $data = $this->getFilteredData();
 
+        $godownDetails = $this->paginateCollection(
+            collect($this->product->godowns)->map(function ($godown) {
+                return [
+                    'godownid' => $godown->locationid ?? 'N/A',
+                    'retailer_name'    => $godown->retailer_name ?? 'N/A',
+                    'godown_id'   => $godown->id,
+                ];
+            })->values()->all(),
+            10,
+            'godownsPage'
+        );
+
+        $locations = location::all();
+
         return view('livewire.productdetails', [
-            'product' => $this->product,
-            'filteredPrices' => $this->paginateCollection($data['prices'], 10, 'pricesPage'),
+            'product'           => $this->product,
+            'filteredPrices'    => $this->paginateCollection($data['prices'], 10, 'pricesPage'),
             'filteredBatchRows' => $this->paginateCollection($data['batchMappedRows'], 10, 'batchesPage'),
+            'godownDetails'     => $godownDetails,
+            'locations'         => $locations,
         ])->layout('layouts.header');
     }
 }
