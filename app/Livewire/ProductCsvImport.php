@@ -11,6 +11,7 @@ use App\Models\brand;
 use App\Models\categorytable;
 use App\Models\Godown;        // ← add this
 use App\Models\location;     // ← add this (or whatever your Location model is)
+use App\Models\product_batch;
 use Illuminate\Support\Facades\DB;
 
 class ProductCsvImport extends Component
@@ -151,8 +152,14 @@ class ProductCsvImport extends Component
                 $batch = null;
 
                 if (!empty($batchNo)) {
+                    $pro_batch = product_batch::updateOrCreate(
+                        ['product_id' => $product->id, 'batch_number' => $batchNo]
+                    );
+                }
+
+                if (!empty($batchNo)) {
                     $batch = BatchProductPrice::updateOrCreate(
-                        ['pid' => $product->id, 'batchno' => $batchNo],
+                        ['pid' => $product->id, 'state' => $state, 'batchno' => $pro_batch->id],
                         [
                             'boxqty'       => $boxqty,
                             'pcsqty'       => $pcsqty,
@@ -165,7 +172,7 @@ class ProductCsvImport extends Component
                 // ── 4. Price table ─────────────────────────────────────────
                 if (!empty($state) && $batch) {
                     $priceRow = ProductPriceTable::updateOrCreate(
-                        ['pid' => $product->id, 'state' => $state, 'batchnos' => $batch->id],
+                        ['pid' => $product->id, 'state' => $state, 'batchnos' => $pro_batch->id],
                         [
                             'pricecndf'        => $priceCndf,
                             'pricedistributor' => $priceDistributor,

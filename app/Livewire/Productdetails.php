@@ -140,18 +140,22 @@ class Productdetails extends Component
 
     private function getFilteredData()
     {
-        $prices = collect($this->product->prices);
-        $batches = collect($this->product->batches);
+        $prices  = collect($this->product->prices);   // product_price_tables
+        $batches = collect($this->product->batches);  // batch_product_prices, keyed by id
 
+        // Load product_batches so we can show the real batch_number (May-01, Jul-01...)
+        $productBatches = \App\Models\product_batch::whereIn('id', $batches->pluck('batchno')->unique())
+            ->get()
+            ->keyBy('id');
+
+        // Apply status / vehicle filters (unchanged)
         if ($this->statusFilter !== '') {
             $isActive = (int) $this->product->Action === 1;
-
-            if ($this->statusFilter === 'active' && !$isActive) {
+            if ($this->statusFilter === 'active'   && !$isActive) {
                 $prices = collect([]);
                 $batches = collect([]);
             }
-
-            if ($this->statusFilter === 'inactive' && $isActive) {
+            if ($this->statusFilter === 'inactive' &&  $isActive) {
                 $prices = collect([]);
                 $batches = collect([]);
             }
@@ -165,66 +169,69 @@ class Productdetails extends Component
         }
 
         if ($this->stateSearch !== '') {
-            $prices = $prices->filter(function ($price) {
-                return stripos($price->state ?? '', $this->stateSearch) !== false;
-            });
+            $prices = $prices->filter(fn($p) => stripos($p->state ?? '', $this->stateSearch) !== false);
         }
 
-        if ($this->batchSearch !== '') {
-            $batches = $batches->filter(function ($batch) {
-                return stripos($batch->batchno ?? '', $this->batchSearch) !== false
-                    || stripos((string) $batch->id, $this->batchSearch) !== false;
-            });
-
-            $prices = $prices->filter(function ($price) {
-                return stripos($price->batchnos ?? '', $this->batchSearch) !== false;
-            });
-        }
-
+        // Build rows: one price row → look up the matching batch row by batchno+state
         $batchMappedRows = [];
 
-        foreach ($batches as $batch) {
-            foreach ($prices as $price) {
-                if ($this->batchMatched($batch, $price)) {
-                    $batchMappedRows[] = [
-                        'price_id' => $price->id,
-                        'batch_id' => $batch->id,
-                        'product_id' => $this->product->id,
+        foreach ($prices as $price) {
+            $batchId = (int) trim((string) ($price->batchnos ?? ''));
 
-                        'batchno' => $batch->batchno ?? 'N/A',
-                        'boxqty' => $batch->boxqty ?? $batch->qty ?? 0,
-                        'pcsqty' => $batch->pcsqty ?? $batch->maxqty ?? 0,
-                        'totalqty' => $batch->totalqty ?? 0,
-                        'inventoryqty' => $batch->inventoryqty ?? 0,
+            // Find the batch_product_prices row that matches this price's batchno AND state
+            $batch = $batches->first(
+                fn($b) =>
+                (int) $b->batchno === $batchId && $b->state === $price->state
+            );
 
-                        'state' => $price->state ?? 'N/A',
-                        'pricecndf' => $price->pricecndf ?? 0,
-                        'pricedistributor' => $price->pricedistributor ?? 0,
-                        'pricedealer' => $price->pricedealer ?? 0,
-                        'pricesubdealer' => $price->pricesubdealer ?? 0,
-                        'priceretialer' => $price->priceretialer ?? 0,
-                    ];
-                }
+            // Fallback: match by batchno only (if state not stored on batch row)
+            if (!$batch) {
+                $batch = $batches->first(fn($b) => (int) $b->batchno === $batchId);
             }
+
+            if (!$batch) continue;
+
+            // Get the real batch_number (May-01, Jul-01...) from product_batches
+            $realBatch = $productBatches->get($batchId);
+
+            $batchMappedRows[] = [
+                'price_id'         => $price->id,
+                'batch_id'         => $batch->id,
+                'product_id'       => $this->product->id,
+
+                'batchno'          => $realBatch->batch_number ?? $batch->batchno ?? 'N/A',
+                'boxqty'           => $batch->boxqty ?? 0,
+                'pcsqty'           => $batch->pcsqty ?? 0,
+                'totalqty'         => $batch->totalqty ?? 0,
+                'inventoryqty'     => $batch->inventoryqty ?? 0,
+
+                'state'            => $price->state ?? 'N/A',
+                'pricecndf'        => $price->pricecndf ?? 0,
+                'pricedistributor' => $price->pricedistributor ?? 0,
+                'pricedealer'      => $price->pricedealer ?? 0,
+                'pricesubdealer'   => $price->pricesubdealer ?? 0,
+                'priceretialer'    => $price->priceretialer ?? 0,
+            ];
         }
 
         $batchMappedRows = collect($batchMappedRows);
 
         if ($this->batchStateFilter !== '') {
-            $batchMappedRows = $batchMappedRows->filter(function ($row) {
-                return stripos($row['state'] ?? '', $this->batchStateFilter) !== false;
-            });
+            $batchMappedRows = $batchMappedRows->filter(
+                fn($row) =>
+                stripos($row['state'] ?? '', $this->batchStateFilter) !== false
+            );
         }
 
         if ($this->batchNoFilter !== '') {
-            $batchMappedRows = $batchMappedRows->filter(function ($row) {
-                return stripos($row['batchno'] ?? '', $this->batchNoFilter) !== false
-                    || stripos((string) $row['batch_id'], $this->batchNoFilter) !== false;
-            });
+            $batchMappedRows = $batchMappedRows->filter(
+                fn($row) =>
+                stripos($row['batchno'] ?? '', $this->batchNoFilter) !== false
+            );
         }
 
         return [
-            'prices' => $prices->values(),
+            'prices'          => $prices->values(),
             'batchMappedRows' => $batchMappedRows->values(),
         ];
     }
@@ -386,10 +393,15 @@ class Productdetails extends Component
         $product = Productadmintab::with(['batches', 'prices'])
             ->findOrFail($this->product->id);
 
-        return response()->streamDownload(function () use ($product) {
+        // Load real batch names (May-01, Jul-01...) from product_batches
+        $productBatches = \App\Models\product_batch::whereIn(
+            'id',
+            collect($product->batches)->pluck('batchno')->unique()
+        )->get()->keyBy('id');
+
+        return response()->streamDownload(function () use ($product, $productBatches) {
 
             $handle = fopen('php://output', 'w');
-
             fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             fputcsv($handle, [
@@ -401,14 +413,12 @@ class Productdetails extends Component
                 'Total PCS',
                 'Box Quantity',
                 'Status',
-
                 'Batch ID',
                 'Batch No',
                 'Box Qty',
                 'PCS Qty',
                 'Total Qty',
                 'Inventory Qty',
-
                 'State',
                 'CNDF Price',
                 'Distributor Price',
@@ -417,51 +427,50 @@ class Productdetails extends Component
                 'Retailer Price',
             ]);
 
-            foreach ($product->batches as $batch) {
+            $batches = collect($product->batches);
 
-                foreach ($product->prices as $price) {
+            foreach ($product->prices as $price) {
+                $batchId = (int) trim((string) ($price->batchnos ?? ''));
 
-                    $batchNosArray = collect(
-                        explode(',', str_replace(["'", '"'], '', $price->batchnos ?? ''))
-                    )->map(fn($item) => trim($item))
-                        ->filter()
-                        ->values();
+                // Match by batchno (product_batches.id) AND state
+                $batch = $batches->first(
+                    fn($b) =>
+                    (int) $b->batchno === $batchId && $b->state === $price->state
+                );
 
-                    $batchId = (string) ($batch->id ?? '');
-                    $batchNo = trim((string) ($batch->batchno ?? ''));
-
-                    $matched = $batchNosArray->contains($batchId)
-                        || $batchNosArray->contains($batchNo);
-
-                    if ($matched) {
-
-                        fputcsv($handle, [
-
-                            $product->id,
-                            $product->productname ?? '',
-                            $product->category ?? '',
-                            $product->vehicle ?? '',
-                            strip_tags($product->description ?? ''),
-                            $product->quantity ?? '',
-                            $product->boxquantity ?? '',
-                            $product->Action ? 'Active' : 'Inactive',
-
-                            $batch->id ?? '',
-                            $batch->batchno ?? '',
-                            $batch->boxqty ?? $batch->qty ?? 0,
-                            $batch->pcsqty ?? $batch->maxqty ?? 0,
-                            $batch->totalqty ?? 0,
-                            $batch->inventoryqty ?? 0,
-
-                            $price->state ?? '',
-                            $price->pricecndf ?? 0,
-                            $price->pricedistributor ?? 0,
-                            $price->pricedealer ?? 0,
-                            $price->pricesubdealer ?? 0,
-                            $price->priceretialer ?? 0,
-                        ]);
-                    }
+                // Fallback: match by batchno only
+                if (!$batch) {
+                    $batch = $batches->first(fn($b) => (int) $b->batchno === $batchId);
                 }
+
+                if (!$batch) continue;
+
+                $realBatch = $productBatches->get($batchId);
+
+                fputcsv($handle, [
+                    $product->id,
+                    $product->productname ?? '',
+                    $product->category ?? '',
+                    $product->vehicle ?? '',
+                    strip_tags($product->description ?? ''),
+                    $product->quantity ?? '',
+                    $product->boxquantity ?? '',
+                    $product->Action ? 'Active' : 'Inactive',
+
+                    $batch->id,
+                    $realBatch->batch_number ?? $batch->batchno ?? '',
+                    $batch->boxqty ?? 0,
+                    $batch->pcsqty ?? 0,
+                    $batch->totalqty ?? 0,
+                    $batch->inventoryqty ?? 0,
+
+                    $price->state ?? '',
+                    $price->pricecndf ?? 0,
+                    $price->pricedistributor ?? 0,
+                    $price->pricedealer ?? 0,
+                    $price->pricesubdealer ?? 0,
+                    $price->priceretialer ?? 0,
+                ]);
             }
 
             fclose($handle);
