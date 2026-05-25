@@ -37,7 +37,10 @@ class productadmintab extends Model
         'Action',
         'categoryid',
         'brandid',
-        'brand'
+        'brand',
+        'location',
+        'locationid',
+        'retailer_name'
     ];
 
     public function batches()
@@ -48,5 +51,10 @@ class productadmintab extends Model
     public function prices()
     {
         return $this->hasMany(ProductPriceTable::class, 'pid');
+    }
+
+    public function godowns()
+    {
+        return $this->hasMany(Godown::class, 'pid');
     }
 }

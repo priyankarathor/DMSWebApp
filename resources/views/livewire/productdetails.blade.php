@@ -88,208 +88,247 @@
     <div class="container mt-4">
 
         @if(session()->has('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
         @endif
 
         @if(session()->has('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
         @endif
 
         @if($product)
-            <div class="card shadow-sm border-0 rounded-4">
+        <div class="card shadow-sm border-0 rounded-4">
 
-                <div class="card-header bg-white border-0 py-3">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
-                        <h4 class="mb-0 fw-bold text-success">Product Full Details</h4>
+            <div class="card-header bg-white border-0 py-3">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h4 class="mb-0 fw-bold text-success">Product Full Details</h4>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="{{ url('/batchtracking/' . $product->id) }}"
+                            class="btn btn-outline-secondary rounded-pill px-4">
+                            Batch No Tracking
+                        </a>
+
+                        <a href="{{ url('/productlist') }}" class="btn btn-outline-secondary rounded-pill px-4">
+                            Back
+                        </a>
+
+                        <a href="{{ url('/batchedit/' . $product->id) }}"
+                            class="btn btn-outline-success rounded-pill px-4">
+                            Edit
+                        </a>
 
                         <div class="d-flex gap-2 flex-wrap">
-                            <a href="{{ url('/batchtracking/' . $product->id) }}"
-                                class="btn btn-outline-secondary rounded-pill px-4">
-                                Batch No Tracking
-                            </a>
 
-                            <a href="{{ url('/productlist') }}" class="btn btn-outline-secondary rounded-pill px-4">
-                                Back
-                            </a>
-
-                            <a href="{{ url('/batchedit/' . $product->id) }}"
-                                class="btn btn-outline-success rounded-pill px-4">
-                                Edit
-                            </a>
-
-                            <div class="d-flex gap-2 flex-wrap">
-
-                                <button type="button" class="btn btn-success rounded-pill px-4"
-                                    wire:click="downloadFullProductCsv">
-                                    Download Full Product CSV
-                                </button>
-
-                            </div>
-
-                            <button type="button" class="btn btn-outline-danger rounded-pill px-4"
-                                wire:click="deleteproduct({{ $product->id }})"
-                                onclick="return confirm('Are you sure you want to delete this product?')">
-                                Delete
+                            <button type="button" class="btn btn-success rounded-pill px-4"
+                                wire:click="downloadFullProductCsv">
+                                Download Full Product CSV
                             </button>
+
                         </div>
+
+                        <button type="button" class="btn btn-outline-danger rounded-pill px-4"
+                            wire:click="deleteproduct({{ $product->id }})"
+                            onclick="return confirm('Are you sure you want to delete this product?')">
+                            Delete
+                        </button>
                     </div>
                 </div>
+            </div>
 
-                <div class="card-body p-4">
+            <div class="card-body p-4">
 
-                    <div class="row g-4 mb-4">
-                        <div class="col-md-4 text-center">
-                            <img src="{{ asset('image/' . $product->file) }}" alt="Product Image"
-                                class="product-image shadow-sm">
-                        </div>
+                <div class="row g-4 mb-4">
+                    <div class="col-md-4 text-center">
+                        <img src="{{ asset('image/' . $product->file) }}" alt="Product Image"
+                            class="product-image shadow-sm">
+                    </div>
 
-                        <div class="col-md-8">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <div class="detail-card">
-                                        <strong>Product Name:</strong><br>
-                                        {{ $product->productname }}
-                                    </div>
+                    <div class="col-md-8">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="detail-card">
+                                    <strong>Product Name:</strong><br>
+                                    {{ $product->productname }}
                                 </div>
+                            </div>
 
-                                <div class="col-md-6">
-                                    <div class="detail-card">
-                                        <strong>Category:</strong><br>
-                                        {{ $product->category }}
-                                    </div>
+                            <div class="col-md-6">
+                                <div class="detail-card">
+                                    <strong>Category:</strong><br>
+                                    {{ $product->category }}
                                 </div>
+                            </div>
 
-                                <div class="col-md-6">
-                                    <div class="detail-card">
-                                        <strong>Total PCS:</strong><br>
-                                        {{ $product->quantity }}
-                                    </div>
+                            <div class="col-md-6">
+                                <div class="detail-card">
+                                    <strong>Total PCS:</strong><br>
+                                    {{ $product->quantity }}
                                 </div>
+                            </div>
 
-                                <!-- <div class="col-md-6">
+                            <!-- <div class="col-md-6">
                                         <div class="detail-card">
                                             <strong>Box Quantity:</strong><br>
                                             {{ $product->boxquantity }}
                                         </div>
                                     </div> -->
 
-                                <!-- <div class="col-md-6">
+                            <!-- <div class="col-md-6">
                                         <div class="detail-card">
                                             <strong>Vehicle:</strong><br>
                                             {{ $product->vehicle ?? 'N/A' }}
                                         </div>
                                     </div> -->
 
-                                <div class="col-md-6">
-                                    <div class="detail-card">
-                                        <strong>Status:</strong><br>
-                                        {{ $product->Action ? 'Active' : 'Inactive' }}
-                                    </div>
+                            <div class="col-md-6">
+                                <div class="detail-card">
+                                    <strong>Status:</strong><br>
+                                    {{ $product->Action ? 'Active' : 'Inactive' }}
                                 </div>
+                            </div>
 
-                                <div class="col-md-12">
-                                    <div class="detail-card">
-                                        <strong>Description:</strong><br>
-                                        {!! $product->description !!}
-                                    </div>
+                            <div class="col-md-12">
+                                <div class="detail-card">
+                                    <strong>Description:</strong><br>
+                                    {!! $product->description !!}
                                 </div>
                             </div>
                         </div>
                     </div>
-
-
-
-                    <div class="mb-3">
-                        <h5 class="section-title">Batch-wise Price Mapping</h5>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Filter Batch No</label>
-                                <input type="text" class="form-control" wire:model.live.debounce.500ms="batchNoFilter"
-                                    placeholder="Filter batch no">
-                            </div>
-
-                            <div class="col-md-4">
-                                <label class="form-label fw-bold">Filter State</label>
-                                <input type="text" class="form-control" wire:model.live.debounce.500ms="batchStateFilter"
-                                    placeholder="Filter state">
-                            </div>
-
-                            <div class="col-md-4 d-flex align-items-end">
-                                <button type="button" class="btn btn-success w-100" wire:click="downloadCsv">
-                                    Download CSV
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped align-middle">
-                                <thead class="table-success">
-                                    <tr>
-                                        <th>Sr No.</th>
-                                        <th>Batch No</th>
-                                        <th>Box Qty</th>
-                                        <th>PCS Qty</th>
-                                        <th>Total Pcs</th>
-                                        <th>Inventory</th>
-                                        <th>State</th>
-                                        <th>CNDF Price</th>
-                                        <th>Distributor Price</th>
-                                        <th>Dealer Price</th>
-                                        <th>Sub Dealer Price</th>
-                                        <th>Retailer Price</th>
-                                        <th>Edit</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-                                    @forelse($filteredBatchRows as $index => $row)
-                                        <tr>
-                                            <td>{{ $filteredBatchRows->firstItem() + $index }}</td>
-                                            <td>{{ $row['batchno'] }}</td>
-                                            <td>{{ $row['boxqty'] }}</td>
-                                            <td>{{ $row['pcsqty'] }}</td>
-                                            <td>{{ $row['totalqty'] }}</td>
-                                            <td>{{ $row['inventoryqty'] ?? '' }}</td>
-                                            <td>{{ $row['state'] }}</td>
-                                            <td>₹{{ $row['pricecndf'] }}</td>
-                                            <td>₹{{ $row['pricedistributor'] }}</td>
-                                            <td>₹{{ $row['pricedealer'] }}</td>
-                                            <td>₹{{ $row['pricesubdealer'] }}</td>
-                                            <td>₹{{ $row['priceretialer'] }}</td>
-                                            <td>
-                                                <button type="button" wire:click="editPrice({{ $row['price_id'] }})"
-                                                    class="btn btn-sm btn-primary">
-                                                    Edit
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="13" class="text-center text-muted">
-                                                No batch details found
-                                            </td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <div class="mt-3">
-                            {{ $filteredBatchRows->links() }}
-                        </div>
-                    </div>
-
                 </div>
+
+                <div class="mb-3">
+                    <h5 class="section-title">Godown Details</h5>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped align-middle">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Sr No.</th>
+                                    <th>Location</th>
+                                    <th>Retailer</th>
+                                    <th>Edit</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($godownDetails as $index => $row)
+                                <tr>
+                                    <td>{{ $godownDetails->firstItem() + $index }}</td>
+                                    <td>{{ \App\Models\Location::find($row['godownid'])?->location_name ?? 'N/A' }}</td>
+                                    <td>{{ $row['retailer_name'] }}</td>
+                                    <td>
+                                        <button type="button" wire:click="editGodown({{ $row['godown_id'] }})"
+                                            class="btn btn-sm btn-primary">
+                                            Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="6" class="text-center text-muted">No godown details found</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-3">
+                        {{ $godownDetails->links() }}
+                    </div>
+                </div>
+
+
+                <div class="mb-3">
+                    <h5 class="section-title">Batch-wise Price Mapping</h5>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Filter Batch No</label>
+                            <input type="text" class="form-control" wire:model.live.debounce.500ms="batchNoFilter"
+                                placeholder="Filter batch no">
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold">Filter State</label>
+                            <input type="text" class="form-control" wire:model.live.debounce.500ms="batchStateFilter"
+                                placeholder="Filter state">
+                        </div>
+
+                        <div class="col-md-4 d-flex align-items-end">
+                            <button type="button" class="btn btn-success w-100" wire:click="downloadCsv">
+                                Download CSV
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped align-middle">
+                            <thead class="table-success">
+                                <tr>
+                                    <th>Sr No.</th>
+                                    <th>Batch No</th>
+                                    <th>Box Qty</th>
+                                    <th>PCS Qty</th>
+                                    <th>Total Pcs</th>
+                                    <th>Inventory</th>
+                                    <th>State</th>
+                                    <th>CNDF Price</th>
+                                    <th>Distributor Price</th>
+                                    <th>Dealer Price</th>
+                                    <th>Sub Dealer Price</th>
+                                    <th>Retailer Price</th>
+                                    <th>Edit</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                @forelse($filteredBatchRows as $index => $row)
+                                <tr>
+                                    <td>{{ $filteredBatchRows->firstItem() + $index }}</td>
+                                    <td>{{ $row['batchno'] }}</td>
+                                    <td>{{ $row['boxqty'] }}</td>
+                                    <td>{{ $row['pcsqty'] }}</td>
+                                    <td>{{ $row['totalqty'] }}</td>
+                                    <td>{{ $row['inventoryqty'] ?? '' }}</td>
+                                    <td>{{ $row['state'] }}</td>
+                                    <td>₹{{ $row['pricecndf'] }}</td>
+                                    <td>₹{{ $row['pricedistributor'] }}</td>
+                                    <td>₹{{ $row['pricedealer'] }}</td>
+                                    <td>₹{{ $row['pricesubdealer'] }}</td>
+                                    <td>₹{{ $row['priceretialer'] }}</td>
+                                    <td>
+                                        <button type="button" wire:click="editPrice({{ $row['price_id'] }})"
+                                            class="btn btn-sm btn-primary">
+                                            Edit
+                                        </button>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="13" class="text-center text-muted">
+                                        No batch details found
+                                    </td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="mt-3">
+                        {{ $filteredBatchRows->links() }}
+                    </div>
+                </div>
+
             </div>
+        </div>
         @else
-            <div class="alert alert-danger">
-                Product not found.
-            </div>
+        <div class="alert alert-danger">
+            Product not found.
+        </div>
         @endif
     </div>
 
@@ -368,16 +407,82 @@
         </div>
     </div>
 
+
+
+    <div wire:ignore.self class="modal fade" id="editGodownModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Edit Godown</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+
+                <form wire:submit.prevent="updateGodown">
+                    <div class="modal-body">
+                        <div class="row">
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Location</label>
+                                <select wire:model="editLocation" class="form-control">
+                                    <option value="" disabled>Select Location</option>
+                                    @foreach ($locations as $location)
+                                    <option value="{{ $location->id }}">{{ $location->location_name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('editLocation') <small class="text-danger">{{ $message }}</small> @enderror
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Retailer</label>
+                                <input type="text" wire:model="editRetailergodown" class="form-control">
+                                @error('editRetailergodown') <small class="text-danger d-block">{{ $message }}</small>
+                                @enderror
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Close
+                        </button>
+
+                        <button type="submit" class="btn btn-success">
+                            Update
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
     <script>
-        document.addEventListener('livewire:init', function () {
-            Livewire.on('open-edit-price-modal', function () {
+        document.addEventListener('livewire:init', function() {
+            Livewire.on('open-edit-price-modal', function() {
                 const modalElement = document.getElementById('editPriceModal');
                 const modal = new bootstrap.Modal(modalElement);
                 modal.show();
             });
 
-            Livewire.on('close-edit-price-modal', function () {
+            Livewire.on('close-edit-price-modal', function() {
                 const modalElement = document.getElementById('editPriceModal');
+                const modal = bootstrap.Modal.getInstance(modalElement);
+
+                if (modal) {
+                    modal.hide();
+                }
+            });
+
+            Livewire.on('open-edit-godown-modal', function() {
+                const modalElement = document.getElementById('editGodownModal');
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+            });
+
+            Livewire.on('close-edit-godown-modal', function() {
+                const modalElement = document.getElementById('editGodownModal');
                 const modal = bootstrap.Modal.getInstance(modalElement);
 
                 if (modal) {

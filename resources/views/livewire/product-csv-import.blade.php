@@ -3,15 +3,15 @@
     <h2 style="margin-bottom: 20px; color: #1f3b6d;">Import Product CSV</h2>
 
     @if (session()->has('success'))
-        <div style="color: green; margin-bottom: 15px;">
-            {{ session('success') }}
-        </div>
+    <div style="color: green; margin-bottom: 15px;">
+        {{ session('success') }}
+    </div>
     @endif
 
     @if (session()->has('error'))
-        <div style="color: red; margin-bottom: 15px;">
-            {{ session('error') }}
-        </div>
+    <div style="color: red; margin-bottom: 15px;">
+        {{ session('error') }}
+    </div>
     @endif
 
     <div style="margin-bottom: 18px;">
@@ -22,14 +22,14 @@
             <option value="">---- Select Category ----</option>
 
             @foreach ($category as $item)
-                <option value="{{ $item->id }}">
-                    {{ $item->value }}
-                </option>
+            <option value="{{ $item->id }}">
+                {{ $item->value }}
+            </option>
             @endforeach
         </select>
 
         @error('selectedCategoryId')
-            <div style="color: red; margin-top: 6px;">{{ $message }}</div>
+        <div style="color: red; margin-top: 6px;">{{ $message }}</div>
         @enderror
     </div>
 
@@ -41,18 +41,30 @@
             <option value="">---- Select Brand ----</option>
 
             @foreach ($brand as $item)
-                <option value="{{ $item->id }}">
-                    {{$item->brandName}}
-                </option>
+            <option value="{{ $item->id }}">
+                {{$item->brandName}}
+            </option>
             @endforeach
         </select>
 
         @error('selectedBrandId')
-            <div style="color: red; margin-top: 6px;">{{ $message }}</div>
+        <div style="color: red; margin-top: 6px;">{{ $message }}</div>
         @enderror
     </div>
 
-    <div style="margin-bottom: 12px; padding: 10px; background: #f8f9fa; border-radius: 5px; display:none;" >
+
+    <div style="margin-bottom: 18px;">
+        <label>Location</label>
+        <select wire:model="selectedLocationId" class="form-control" style="width: 100%; padding: 10px 15px; border: 1px solid #ddd; border-radius: 5px;">
+            <option value="">---- Select Location ----</option>
+            @foreach($locations as $loc)
+            <option value="{{ $loc->id }}">{{ $loc->location_name }}</option>
+            @endforeach
+        </select>
+        @error('selectedLocationId') <span>{{ $message }}</span> @enderror
+    </div>
+
+    <div style="margin-bottom: 12px; padding: 10px; background: #f8f9fa; border-radius: 5px; display:none;">
         <strong>Selected Category ID:</strong> {{ $selectedCategoryId ?: 'Not selected' }} <br>
         <strong>Selected Brand ID:</strong> {{ $selectedBrandId ?: 'Not selected' }}
     </div>
@@ -66,7 +78,7 @@
                 style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
 
             @error('csv')
-                <div style="color: red; margin-top: 6px;">{{ $message }}</div>
+            <div style="color: red; margin-top: 6px;">{{ $message }}</div>
             @enderror
         </div>
 

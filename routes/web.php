@@ -1,4 +1,5 @@
 <?php
+
 use App\Livewire\Adminorderproduct;
 use App\Livewire\Adminorderlisttouser;
 use App\Livewire\Adminorderhistory;
@@ -76,7 +77,8 @@ use App\Livewire\Brandadd;
 use App\Livewire\Userstockdetails;
 use App\Livewire\Batchedit;
 use App\Livewire\UserProductDetails;
-
+use App\Livewire\GodownInventory;
+use App\Livewire\Locationadd;
 
 Route::middleware([
     'auth:sanctum',
@@ -178,9 +180,9 @@ Route::middleware([
 
     Route::post('/adminStatus', [Orderproduct::class, 'adminStatus'])->name('admin.status');
     // Route::get('/dealerlist',Dealerlist::class)->name('dealerlist');
-// Route::get('/subdealerlist',Subdealerlist::class)->name('subdealerlist');
-// Route::get('/retailerlist',Retailerlist::class)->name('retailerlist');
-// Route::get('/employeelist',Employeelist::class)->name('employeelist');
+    // Route::get('/subdealerlist',Subdealerlist::class)->name('subdealerlist');
+    // Route::get('/retailerlist',Retailerlist::class)->name('retailerlist');
+    // Route::get('/employeelist',Employeelist::class)->name('employeelist');
     Route::get('/authdealer', Authdealertable::class)->name('authdealer');
     Route::get('/invoicedata', Invoicedata::class)->name('invoicedata');
     Route::get('/invoicedatatable', Invoiceviewtable::class)->name('invoicedatatable');
@@ -225,7 +227,17 @@ Route::middleware([
     Route::get('/userbranddataedit/{id}', Brandadd::class)->name('userbranddataedit');
     Route::post('/branndedit/{id}', [Brandadd::class, 'branddataedit'])->name('branndedit');
 
-    //end brand add
+
+    // location add
+
+    Route::get('/userlocation', Locationadd::class)->name('userlocation');
+    Route::post('/userlocationdata', [Locationadd::class, 'locationdata'])->name('userlocationdata');
+    Route::get('/userlocationdelete/{id}', [Locationadd::class, 'deletediscountdata'])->name('userlocationdelete');
+
+    Route::get('/userlocationdataedit/{id}', Locationadd::class)->name('userlocationdataedit');
+    Route::post('/locationedit/{id}', [Locationadd::class, 'locationdataedit'])->name('locationedit');
+
+    //end location add
 
     Route::get('/productinventery', Myproductinventery::class)->name('productinventery');
 
@@ -277,4 +289,5 @@ Route::middleware([
     Route::get('/batchedit/{id?}', Batchedit::class)->name('batchedit');
 
     Route::get('/user-product-details/{userId}', UserProductDetails::class)->name('user.product.details');
+    Route::get('/godown-inventory', GodownInventory::class)->name('godown.inventory');
 });
