@@ -186,6 +186,7 @@
         }
 
         @media(max-width: 992px) {
+
             .stats-grid,
             .filter-section {
                 grid-template-columns: 1fr 1fr;
@@ -193,6 +194,7 @@
         }
 
         @media(max-width: 576px) {
+
             .stats-grid,
             .filter-section {
                 grid-template-columns: 1fr;
@@ -241,7 +243,7 @@
                     <select wire:model.live="batchFilter">
                         <option value="">All Batches</option>
                         @foreach($batchList as $batch)
-                            <option value="{{ $batch }}">{{ $batch }}</option>
+                            <option value="{{ $batch->id }}">{{ $batch->batch_number }}</option>
                         @endforeach
                     </select>
                 </div>

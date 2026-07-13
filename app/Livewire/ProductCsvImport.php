@@ -26,18 +26,16 @@ class ProductCsvImport extends Component
     public function import()
     {
         $this->validate([
-            'csv'                => 'required|mimes:csv,txt',
-            'selectedCategoryId' => 'required',
-            'selectedBrandId'    => 'required',
+            'csv' => 'required|mimes:csv,txt',
+            'selectedBrandId' => 'required',
             'selectedLocationId' => 'required',   // ← NEW
         ]);
 
-        $selectedCategory = categorytable::find($this->selectedCategoryId);
-        $selectedBrand    = brand::find($this->selectedBrandId);
+        $selectedBrand = brand::find($this->selectedBrandId);
         $selectedLocation = location::find($this->selectedLocationId);  // ← NEW
 
-        if (!$selectedCategory || !$selectedBrand || !$selectedLocation) {
-            session()->flash('error', 'Invalid category, brand, or location selected.');
+        if (!$selectedBrand || !$selectedLocation) {
+            session()->flash('error', 'Invalid brand or location selected.');
             return;
         }
 
@@ -68,79 +66,80 @@ class ProductCsvImport extends Component
                 $row = array_map(fn($v) => $this->cleanCsvValue($v), $row);
                 $data = array_combine($header, $row);
 
-                if (!$data) continue;
+                if (!$data)
+                    continue;
 
-                $productName  = $data['product name'] ?? '';
-                $description  = $data['description'] ?? '';
+                $productName = $data['product name'] ?? '';
+                $description = $data['description'] ?? '';
                 $productPrice = $data['product cost price'] ?? $data['product price'] ?? '';
-                $category     = $selectedCategory->value;
-                $brandName    = $selectedBrand->brandName;
-                $location     = $selectedLocation->location_name;
+                $category = $data['category'] ?? '';
+                $brandName = $selectedBrand->brandName;
+                $location = $selectedLocation->location_name;
                 $retailerName = $data['retailer_name'] ?? $data['retailer name'] ?? '';
-                $fileValue    = $data['file'] ?? '';
-                $image        = $data['image'] ?? '';
-                $quantity     = $data['quantity'] ?? '';
-                $weightNum    = $data['weight num'] ?? '';
-                $weightClass  = $data['weight class'] ?? '';
-                $hsnCode      = $data['hsn code'] ?? '';
-                $dp           = $data['dp'] ?? '';
-                $mop          = $data['mop'] ?? '';
-                $mrp          = $data['mrp'] ?? '';
-                $link         = $data['link'] ?? '';
-                $metaTag      = $data['meta tag'] ?? '';
-                $metaKeyword  = $data['meta keyword'] ?? '';
-                $metaDesc     = $data['meta description'] ?? '';
-                $action       = $data['action'] ?? 'Active';
-                $batchNo      = trim($data['batch no'] ?? '');
-                $boxqty       = (int)($data['box qty'] ?? $data['qty'] ?? 0);
-                $pcsqty       = (int)($data['pcs qty'] ?? $data['max qty'] ?? 0);
-                $totalqty     = $boxqty * $pcsqty;
-                $state        = trim($data['state'] ?? '');
+                $fileValue = $data['file'] ?? '';
+                $image = $data['image'] ?? '';
+                $quantity = $data['quantity'] ?? '';
+                $weightNum = $data['weight num'] ?? '';
+                $weightClass = $data['weight class'] ?? '';
+                $hsnCode = $data['hsn code'] ?? '';
+                $dp = $data['dp'] ?? '';
+                $mop = $data['mop'] ?? '';
+                $mrp = $data['mrp'] ?? '';
+                $link = $data['link'] ?? '';
+                $metaTag = $data['meta tag'] ?? '';
+                $metaKeyword = $data['meta keyword'] ?? '';
+                $metaDesc = $data['meta description'] ?? '';
+                $action = $data['action'] ?? 'Active';
+                $batchNo = trim($data['batch no'] ?? '');
+                $boxqty = (int) ($data['box qty'] ?? $data['qty'] ?? 0);
+                $pcsqty = (int) ($data['pcs qty'] ?? $data['max qty'] ?? 0);
+                $totalqty = $boxqty * $pcsqty;
+                $state = trim($data['state'] ?? '');
 
-                $priceCndf       = $this->cleanPrice($data['price cndf'] ?? 0);
+                $priceCndf = $this->cleanPrice($data['price cndf'] ?? 0);
                 $priceDistributor = $this->cleanPrice($data['price distributor'] ?? 0);
-                $priceDealer     = $this->cleanPrice($data['price dealer'] ?? 0);
-                $priceSubDealer  = $this->cleanPrice($data['price sub dealer'] ?? 0);
-                $priceRetailer   = $this->cleanPrice($data['price retailer'] ?? 0);
+                $priceDealer = $this->cleanPrice($data['price dealer'] ?? 0);
+                $priceSubDealer = $this->cleanPrice($data['price sub dealer'] ?? 0);
+                $priceRetailer = $this->cleanPrice($data['price retailer'] ?? 0);
 
-                if (empty($productName) && empty($hsnCode)) continue;
+                if (empty($productName) && empty($hsnCode))
+                    continue;
 
                 // ── 1. Upsert product ──────────────────────────────────────
                 $product = Productadmintab::updateOrCreate(
                     [
                         'productname' => $productName,
-                        'category'    => $category,
-                        'hsncode'     => $hsnCode,
+                        'category' => $category,
+                        'hsncode' => $hsnCode,
                     ],
                     [
-                        'description'     => $description,
-                        'productprice'    => $productPrice,
-                        'brand'           => $brandName,
-                        'location'        => $location,
-                        'file'            => $fileValue,
-                        'image'           => $image,
-                        'quantity'        => $quantity,
-                        'weightnum'       => $weightNum,
-                        'weihgtclass'     => $weightClass,
-                        'dp'              => $dp,
-                        'mop'             => $mop,
-                        'mrp'             => $mrp,
-                        'link'            => $link,
-                        'metatag'         => $metaTag,
-                        'metakeyword'     => $metaKeyword,
+                        'description' => $description,
+                        'productprice' => $productPrice,
+                        'brand' => $brandName,
+                        'location' => $location,
+                        'file' => $fileValue,
+                        'image' => $image,
+                        'quantity' => $quantity,
+                        'weightnum' => $weightNum,
+                        'weihgtclass' => $weightClass,
+                        'dp' => $dp,
+                        'mop' => $mop,
+                        'mrp' => $mrp,
+                        'link' => $link,
+                        'metatag' => $metaTag,
+                        'metakeyword' => $metaKeyword,
                         'metadescription' => $metaDesc,
-                        'Action'          => $action,
-                        'categoryid'      => $this->selectedCategoryId,
-                        'brandid'         => $this->selectedBrandId,
-                        'locationid'      => $this->selectedLocationId,  // ← NEW (add column if needed)
-                        'retailer_name'   => $retailerName,
+                        'Action' => $action,
+                        'brandid' => $this->selectedBrandId,
+                        'locationid' => $this->selectedLocationId,  // ← NEW (add column if needed)
+                        'retailer_name' => $retailerName,
                     ]
                 );
 
                 // ── 2. Upsert godown row ───────────────────────────────────
                 Godown::updateOrCreate(
                     [
-                        'pid'        => $product->id,
+                        'pid' => $product->id,
                         'locationid' => $this->selectedLocationId,
                     ],
                     [
@@ -161,9 +160,9 @@ class ProductCsvImport extends Component
                     $batch = BatchProductPrice::updateOrCreate(
                         ['pid' => $product->id, 'state' => $state, 'batchno' => $pro_batch->id],
                         [
-                            'boxqty'       => $boxqty,
-                            'pcsqty'       => $pcsqty,
-                            'totalqty'     => $totalqty,
+                            'boxqty' => $boxqty,
+                            'pcsqty' => $pcsqty,
+                            'totalqty' => $totalqty,
                             'inventoryqty' => $totalqty,
                         ]
                     );
@@ -174,11 +173,11 @@ class ProductCsvImport extends Component
                     $priceRow = ProductPriceTable::updateOrCreate(
                         ['pid' => $product->id, 'state' => $state, 'batchnos' => $pro_batch->id],
                         [
-                            'pricecndf'        => $priceCndf,
+                            'pricecndf' => $priceCndf,
                             'pricedistributor' => $priceDistributor,
-                            'pricedealer'      => $priceDealer,
-                            'pricesubdealer'   => $priceSubDealer,
-                            'priceretialer'    => $priceRetailer,
+                            'pricedealer' => $priceDealer,
+                            'pricesubdealer' => $priceSubDealer,
+                            'priceretialer' => $priceRetailer,
                         ]
                     );
 
@@ -200,22 +199,20 @@ class ProductCsvImport extends Component
     public function exportCsv()
     {
         $this->validate([
-            'selectedCategoryId' => 'required',
             'selectedBrandId' => 'required',
             'selectedLocationId' => 'required',
         ]);
 
-        $category = categorytable::find($this->selectedCategoryId);
         $brand = brand::find($this->selectedBrandId);
         $location = location::find($this->selectedLocationId);
 
         $columns = [
-            'Category ID',
-            'Category',
+
             'Brand ID',
             'Brand',
             'Location ID',
             'location',
+            'Category',
             'Retailer Name',
             'Product name',
             'Description',
@@ -246,12 +243,11 @@ class ProductCsvImport extends Component
         ];
 
         $sampleRow = [
-            $this->selectedCategoryId,
-            $category->value ?? '',
             $this->selectedBrandId,
             $brand->brandName ?? '',
             $this->selectedLocationId,
             $location->location_name ?? '',
+            '',
             '',
             '',
             '',
@@ -315,8 +311,8 @@ class ProductCsvImport extends Component
     public function render()
     {
         return view('livewire.product-csv-import', [
-            'brand'     => brand::get(),
-            'category'  => categorytable::where('type', '!=', 'master')->get(),
+            'brand' => brand::get(),
+            'category' => categorytable::where('type', '!=', 'master')->get(),
             'locations' => location::get(),   // ← NEW
         ])->layout('layouts.header');
     }

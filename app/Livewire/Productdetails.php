@@ -140,7 +140,7 @@ class Productdetails extends Component
 
     private function getFilteredData()
     {
-        $prices  = collect($this->product->prices);   // product_price_tables
+        $prices = collect($this->product->prices);   // product_price_tables
         $batches = collect($this->product->batches);  // batch_product_prices, keyed by id
 
         // Load product_batches so we can show the real batch_number (May-01, Jul-01...)
@@ -151,11 +151,11 @@ class Productdetails extends Component
         // Apply status / vehicle filters (unchanged)
         if ($this->statusFilter !== '') {
             $isActive = (int) $this->product->Action === 1;
-            if ($this->statusFilter === 'active'   && !$isActive) {
+            if ($this->statusFilter === 'active' && !$isActive) {
                 $prices = collect([]);
                 $batches = collect([]);
             }
-            if ($this->statusFilter === 'inactive' &&  $isActive) {
+            if ($this->statusFilter === 'inactive' && $isActive) {
                 $prices = collect([]);
                 $batches = collect([]);
             }
@@ -189,28 +189,29 @@ class Productdetails extends Component
                 $batch = $batches->first(fn($b) => (int) $b->batchno === $batchId);
             }
 
-            if (!$batch) continue;
+            if (!$batch)
+                continue;
 
             // Get the real batch_number (May-01, Jul-01...) from product_batches
             $realBatch = $productBatches->get($batchId);
 
             $batchMappedRows[] = [
-                'price_id'         => $price->id,
-                'batch_id'         => $batch->id,
-                'product_id'       => $this->product->id,
+                'price_id' => $price->id,
+                'batch_id' => $batch->id,
+                'product_id' => $this->product->id,
 
-                'batchno'          => $realBatch->batch_number ?? $batch->batchno ?? 'N/A',
-                'boxqty'           => $batch->boxqty ?? 0,
-                'pcsqty'           => $batch->pcsqty ?? 0,
-                'totalqty'         => $batch->totalqty ?? 0,
-                'inventoryqty'     => $batch->inventoryqty ?? 0,
+                'batchno' => $realBatch->batch_number ?? $batch->batchno ?? 'N/A',
+                'boxqty' => $batch->boxqty ?? 0,
+                'pcsqty' => $batch->pcsqty ?? 0,
+                'totalqty' => $batch->totalqty ?? 0,
+                'inventoryqty' => $batch->inventoryqty ?? 0,
 
-                'state'            => $price->state ?? 'N/A',
-                'pricecndf'        => $price->pricecndf ?? 0,
+                'state' => $price->state ?? 'N/A',
+                'pricecndf' => $price->pricecndf ?? 0,
                 'pricedistributor' => $price->pricedistributor ?? 0,
-                'pricedealer'      => $price->pricedealer ?? 0,
-                'pricesubdealer'   => $price->pricesubdealer ?? 0,
-                'priceretialer'    => $price->priceretialer ?? 0,
+                'pricedealer' => $price->pricedealer ?? 0,
+                'pricesubdealer' => $price->pricesubdealer ?? 0,
+                'priceretialer' => $price->priceretialer ?? 0,
             ];
         }
 
@@ -231,7 +232,7 @@ class Productdetails extends Component
         }
 
         return [
-            'prices'          => $prices->values(),
+            'prices' => $prices->values(),
             'batchMappedRows' => $batchMappedRows->values(),
         ];
     }
@@ -443,7 +444,8 @@ class Productdetails extends Component
                     $batch = $batches->first(fn($b) => (int) $b->batchno === $batchId);
                 }
 
-                if (!$batch) continue;
+                if (!$batch)
+                    continue;
 
                 $realBatch = $productBatches->get($batchId);
 
@@ -498,8 +500,8 @@ class Productdetails extends Component
             collect($this->product->godowns)->map(function ($godown) {
                 return [
                     'godownid' => $godown->locationid ?? 'N/A',
-                    'retailer_name'    => $godown->retailer_name ?? 'N/A',
-                    'godown_id'   => $godown->id,
+                    'retailer_name' => $godown->retailer_name ?? 'N/A',
+                    'godown_id' => $godown->id,
                 ];
             })->values()->all(),
             10,
@@ -509,11 +511,11 @@ class Productdetails extends Component
         $locations = location::all();
 
         return view('livewire.productdetails', [
-            'product'           => $this->product,
-            'filteredPrices'    => $this->paginateCollection($data['prices'], 10, 'pricesPage'),
+            'product' => $this->product,
+            'filteredPrices' => $this->paginateCollection($data['prices'], 10, 'pricesPage'),
             'filteredBatchRows' => $this->paginateCollection($data['batchMappedRows'], 10, 'batchesPage'),
-            'godownDetails'     => $godownDetails,
-            'locations'         => $locations,
+            'godownDetails' => $godownDetails,
+            'locations' => $locations,
         ])->layout('layouts.header');
     }
 }
