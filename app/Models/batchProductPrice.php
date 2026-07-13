@@ -13,7 +13,8 @@ class batchProductPrice extends Model
         'pcsqty',
         'totalqty',
         'inventoryqty',
-        'priceid'
+        'priceid',
+        'state'
     ];
 
     public function product()

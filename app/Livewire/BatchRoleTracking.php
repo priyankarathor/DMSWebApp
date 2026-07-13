@@ -63,36 +63,37 @@ class BatchRoleTracking extends Component
             $inventoryQty = $items->sum(fn($row) => (int) ($row->inventery ?? 0));
 
             $order = orderapprovedtable::where(function ($q) use ($first) {
-                    $q->where('userid', $first->uid)
-                      ->orWhere('approveuserid', $first->uid)
-                      ->orWhere('sellerid', $first->uid);
-                })
+                $q->where('userid', $first->uid)
+                    ->orWhere('approveuserid', $first->uid)
+                    ->orWhere('sellerid', $first->uid);
+            })
                 ->whereRaw("FIND_IN_SET(?, REPLACE(batchid, ' ', ''))", [(string) $first->batchid])
                 ->latest('id')
                 ->first();
 
             $user = userhierarchytab::where(function ($q) use ($first) {
-                    $q->where('id', $first->uid)
-                      ->orWhere('registerid', $first->uid)
-                      ->orWhere('userId', $first->uid);
-                })
+                $q->where('id', $first->uid)
+                    ->orWhere('registerid', $first->uid)
+                    ->orWhere('userId', $first->uid);
+            })
                 ->first();
 
             return [
-                'user_id'   => $first->uid,
-                'batch_id'  => $first->batchid,
-                'batchno'   => $batch->batchno ?? 'N/A',
-                'state'     => $order->region ?? $user->region ?? $user->state ?? 'N/A',
-                'role'      => $order->userrole ?? $user->role ?? $user->userrole ?? 'N/A',
-                'name'      => $order->username ?? $user->username ?? $user->name ?? 'N/A',
-                'pcs_qty'   => $inventoryQty,
+                'user_id' => $first->uid,
+                'batch_id' => $first->batchid,
+                'batchno' => $batch->batchno ?? 'N/A',
+                'state' => $order->region ?? $user->region ?? $user->state ?? 'N/A',
+                'role' => $order->userrole ?? $user->role ?? $user->userrole ?? 'N/A',
+                'name' => $order->username ?? $user->username ?? $user->name ?? 'N/A',
+                'pcs_qty' => $inventoryQty,
                 'total_pcs' => $inventoryQty,
             ];
         })->values();
 
         if ($this->search) {
             $search = strtolower(trim($this->search));
-            $rows = $rows->filter(fn($row) =>
+            $rows = $rows->filter(
+                fn($row) =>
                 str_contains(strtolower($row['user_id']), $search) ||
                 str_contains(strtolower($row['name']), $search) ||
                 str_contains(strtolower($row['role']), $search) ||
@@ -102,13 +103,15 @@ class BatchRoleTracking extends Component
         }
 
         if ($this->selectedState) {
-            $rows = $rows->filter(fn($row) =>
+            $rows = $rows->filter(
+                fn($row) =>
                 strtolower($row['state']) === strtolower($this->selectedState)
             )->values();
         }
 
         if ($this->selectedRole) {
-            $rows = $rows->filter(fn($row) =>
+            $rows = $rows->filter(
+                fn($row) =>
                 strtolower($row['role']) === strtolower($this->selectedRole)
             )->values();
         }
@@ -177,12 +180,17 @@ class BatchRoleTracking extends Component
 
     public function render()
     {
-        $batches = BatchProductPrice::where('pid', $this->productId)
+
+
+        $batchNos = BatchProductPrice::where('pid', $this->productId)
             ->whereNotNull('batchno')
-            ->orderBy('batchno')
             ->pluck('batchno')
             ->unique()
             ->values();
+
+        $batches = \App\Models\product_batch::whereIn('id', $batchNos)
+            ->orderBy('batch_number')
+            ->get(['id', 'batch_number']);
 
         $states = collect($this->data)->pluck('state')->filter()->unique()->values();
         $roles = collect($this->data)->pluck('role')->filter()->unique()->values();

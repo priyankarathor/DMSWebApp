@@ -38,10 +38,7 @@
             <div class="mb-3">
                 <label class="form-label fw-bold">Select CSV File</label>
 
-                <input type="file"
-                    wire:model="csvFile"
-                    class="form-control"
-                    accept=".csv,.txt">
+                <input type="file" wire:model="csvFile" class="form-control" accept=".csv,.txt">
 
                 @error('csvFile')
                     <small class="text-danger">{{ $message }}</small>
@@ -74,7 +71,7 @@
                 <table class="table table-bordered table-striped align-middle">
                     <thead class="table-success">
                         <tr>
-                            <th>Batch ID</th>
+                            <!-- <th>Batch ID</th> -->
                             <th>Batch No</th>
                             <th>Box Qty</th>
                             <th>PCS Qty</th>
@@ -86,8 +83,9 @@
                     <tbody>
                         @forelse($product->batches as $batch)
                             <tr>
-                                <td>{{ $batch->id }}</td>
-                                <td>{{ $batch->batchno }}</td>
+                                <!-- <td>{{ $batch->id }}</td> -->
+                                <td>{{ \App\Models\product_batch::where('id', $batch->batchno)->first()->batch_number ?? '-'}}
+                                </td>
                                 <td>{{ $batch->boxqty ?? 0 }}</td>
                                 <td>{{ $batch->pcsqty ?? 0 }}</td>
                                 <td>{{ $batch->totalqty ?? 0 }}</td>
@@ -110,7 +108,7 @@
                 <table class="table table-bordered table-striped align-middle">
                     <thead class="table-success">
                         <tr>
-                            <th>Price ID</th>
+                            <!-- <th>Price ID</th> -->
                             <th>State</th>
                             <th>Batch ID</th>
                             <th>CNDF</th>
@@ -124,9 +122,10 @@
                     <tbody>
                         @forelse($product->prices as $price)
                             <tr>
-                                <td>{{ $price->id }}</td>
+                                <!-- <td>{{ $price->id }}</td> -->
                                 <td>{{ $price->state }}</td>
-                                <td>{{ $price->batchnos }}</td>
+                                <td>{{ \App\Models\product_batch::where('id', $price->batchnos)->first()->batch_number ?? '-'}}
+                                </td>
                                 <td>₹{{ $price->pricecndf ?? 0 }}</td>
                                 <td>₹{{ $price->pricedistributor ?? 0 }}</td>
                                 <td>₹{{ $price->pricedealer ?? 0 }}</td>

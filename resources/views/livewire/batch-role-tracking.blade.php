@@ -38,8 +38,8 @@
         }
 
         .top-badge {
-            background: rgba(255,255,255,0.14);
-            border: 1px solid rgba(255,255,255,0.22);
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.22);
             border-radius: 16px;
             padding: 14px 18px;
             font-weight: 800;
@@ -270,6 +270,7 @@
         }
 
         @media (max-width: 768px) {
+
             .filter-section,
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -310,15 +311,15 @@
                 <div class="filter-box">
                     <label>Search</label>
                     <input type="text" wire:model.live.debounce.400ms="search"
-                           placeholder="Search user, name, state, role, batch...">
+                        placeholder="Search user, name, state, role, batch...">
                 </div>
 
                 <div class="filter-box">
                     <label>Batch No</label>
                     <select wire:model.live="selectedBatchNo">
                         <option value="">All Batches</option>
-                        @foreach($batches as $batchNo)
-                            <option value="{{ $batchNo }}">{{ $batchNo }}</option>
+                        @foreach($batches as $batch)
+                            <option value="{{ $batch->id }}">{{ $batch->batch_number }}</option>
                         @endforeach
                     </select>
                 </div>

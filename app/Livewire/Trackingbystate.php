@@ -104,11 +104,15 @@ class Trackingbystate extends Component
     {
         $batchTable = (new BatchProductPrice)->getTable();
 
-        $batchList = BatchProductPrice::where('pid', $this->productId)
+        $batchNos = BatchProductPrice::where('pid', $this->productId)
             ->whereNotNull('batchno')
             ->pluck('batchno')
             ->unique()
             ->values();
+
+        $batchList = \App\Models\product_batch::whereIn('id', $batchNos)
+            ->orderBy('batch_number')
+            ->get(['id', 'batch_number']);
 
         $stateList = $this->baseQuery()
             ->get()

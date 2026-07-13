@@ -235,6 +235,7 @@ class Distributerorderlist extends Component
         $query = \DB::table('productjunctions as pj')
             ->join('productadmintabs as p', 'p.id', '=', \DB::raw('CAST(pj.pid AS UNSIGNED)'))
             ->join('batch_product_prices as bpp', 'bpp.id', '=', \DB::raw('CAST(pj.batchid AS UNSIGNED)'))
+            ->leftJoin('product_batches as pb', 'pb.id', '=', \DB::raw('CAST(bpp.batchno AS UNSIGNED)'))
             ->join('userhierarchytabs as u', 'u.id', '=', \DB::raw('CAST(pj.uid AS UNSIGNED)'))
             // ✅ pj.rid is a roleid — join directly to userroletabs
             ->leftJoin('userroletabs as rrt', 'rrt.id', '=', \DB::raw('CAST(pj.rid AS UNSIGNED)'))
@@ -277,6 +278,7 @@ class Distributerorderlist extends Component
                 // --- Batch ---
                 'bpp.id as batch_id',
                 'bpp.batchno',
+                'pb.batch_number',
                 'bpp.boxqty',
                 'bpp.pcsqty',
                 'bpp.totalqty',
@@ -371,6 +373,7 @@ class Distributerorderlist extends Component
                             'batch' => [
                                 'batch_id' => $item->batch_id,
                                 'batchno' => $item->batchno,
+                                'batch_number' => $item->batch_number,
                                 'boxqty' => $item->boxqty,
                                 'pcsqty' => $item->pcsqty,
                                 'totalqty' => $item->totalqty,

@@ -263,7 +263,7 @@ class Distributorpage extends Component
      */
     private function buildTree(UserHierarchyTab $user): array
     {
-        $children = UserHierarchyTab::where('zonalId', $user->id)
+        $children = UserHierarchyTab::where('assignid', $user->id)
             ->where('active', '!=', 'deactivate') // ✅ Skip deactivated
             ->get();
 
@@ -277,7 +277,6 @@ class Distributorpage extends Component
             'username' => $user->username,
             'role' => $user->framname,
             'roleid' => $user->roleid,
-            'rgid' => $user->rgid,
             'email' => $user->email,
             'contact' => $user->contactno,
             'city' => $user->city,
